@@ -1,0 +1,63 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: iqaapp
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Build Docker Image
+        run: |
+          docker buildx build --build-arg "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+                        --build-arg "DB_HOST=${{ secrets.DB_HOST }}" \
+                        --build-arg "DB_PORT=5432" \
+                        --build-arg "DB_USERNAME=${{ secrets.DB_USERNAME }}" \
+                        --build-arg "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+                        --build-arg "DB_NAME=${{ secrets.DB_NAME }}" \
+                        --build-arg "SERVERPORT=${{ secrets.SERVERPORT }}" \
+                        --no-cache \
+                        -t iqaapp/backapp:latest \
+                        .
+      - name: Push Docker image to Docker Hub
+        run: docker push iqaapp/backapp:latest
+
+      - name: Display Docker images
+        run: docker images
+        
+  prod:
+    runs-on: ubuntu-latest
+    name: "DEV deploy"
+    needs: build
+
+    steps:
+      - name: Deploy
+        run: ""
+  test:
+    runs-on: ubuntu-latest
+    name: "DEV test"
+    needs: [build, dev]
+
+    steps:
+      - name: Deploy
+        run: ""
