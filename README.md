@@ -36,9 +36,9 @@ $ npm install
 - install TypeORM
 - install class-transformer + class-validator
 - add some folder: controller+providers
-- add dto 
+- add dto
 - install postgres on your machine + UI db tool e.g. dbVievwer
-- 
+- setup db connection to Nest JS. one of such video [some example](https://www.youtube.com/watch?v=pI9C7NH4K5c)
 ```
 
 ## Compile and run the project
