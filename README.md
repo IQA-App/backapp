@@ -30,6 +30,15 @@
 
 ```bash
 $ npm install
+
+# backend setup
+- setup Nest JS
+- install TypeORM
+- install class-transformer + class-validator
+- add some folder: controller+providers
+- add dto 
+- install postgres on your machine + UI db tool e.g. dbVievwer
+- 
 ```
 
 ## Compile and run the project
