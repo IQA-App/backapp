@@ -7,8 +7,12 @@ import {
   HttpCode,
   Param,
   ParseIntPipe,
+  ValidationPipe,
+  Body,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
 // import {CreateUserDto} from
 
 @Controller('user')
@@ -22,8 +26,18 @@ export class UserController {
 
   @Get(':id')
   findOneById(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findOneById();
-    // return { id };
+    const user = this.userService.findOneById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
+  }
+
+  @Post()
+  createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
   }
 
   @Put(':id')
