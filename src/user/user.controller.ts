@@ -1,24 +1,29 @@
-import { Controller, Post, Get, Put, Delete, HttpCode } from '@nestjs/common';
-// import {CreateUserDto} from 
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+// import {CreateUserDto} from
 
 @Controller('user')
 export class UserController {
-  constructor() {}
+  constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAll() {
-    return 'Hello all users!';
+  findAllUsers() {
+    return [];
   }
 
   @Get(':id')
-  findOneById() {
-    return 'Hello single user!';
-  }
-
-  @Post()
-  @HttpCode(201)
-  create() {
-    return 'User created!';
+  findOneById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findOneById();
+    // return { id };
   }
 
   @Put(':id')

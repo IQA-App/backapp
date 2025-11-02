@@ -3,9 +3,17 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-//   private userRepository: Repository
+  //   private userRepository: Repository
 
-  async findAll() {
-    // const users = await 
+  async findAllUsers() {
+    // const users = await
   }
+
+  async findOneById() {}
+
+  async createUser() {}
+
+  async updateUser() {}
+
+  async deleteUser() {}
 }
