@@ -15,14 +15,14 @@ import { AppService } from './app.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
+        type: 'mssql',
         host: configService.get('DB_HOST'),
-        port: +configService.get('DB_HOST'),
+        port: +configService.get('DB_PORT'),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.js, .ts}'],
-        // synchronize: true, //  do not use true for the prod
+        synchronize: true, //  do not use true for the prod
       }),
     }),
   ],

@@ -32,14 +32,16 @@
 $ npm install
 
 # backend setup
-- setup Nest JS
+
+```
+
+- setup Nest JS [tutorial example](https://youtube.com/playlist?list=PL0Zuz27SZ-6MexSAh5x1R3rU6Mg2zYBVr&si=Ag4OQJk8BLx9o591)
 - install TypeORM
 - install class-transformer + class-validator
 - add some folder: controller+providers
 - add dto
-- install postgres on your machine + UI db tool e.g. dbVievwer
+- install typeorm with mssql on your machine + UI db tool e.g. dbVievwer
 - setup db connection to Nest JS. one of such video [some example](https://www.youtube.com/watch?v=pI9C7NH4K5c)
-```
 
 ## Compile and run the project
 
