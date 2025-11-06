@@ -44,8 +44,25 @@ export class UserService {
     return { user };
   }
 
-  async updateUser() {
-    //  add logic here
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('This user was not found');
+    }
+    if (updateUserDto.email) {
+      user.email = updateUserDto.email;
+    }
+    if (updateUserDto.password) {
+      user.password = updateUserDto.password;
+    }
+    await this.userRepository.save(user);
+
+    return user;
   }
 
   async deleteUser() {
