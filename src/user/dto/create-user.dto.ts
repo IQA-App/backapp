@@ -19,7 +19,7 @@ export class CreateUserDto {
   @IsString()
   @IsEmail()
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin latters in email',
+    message: 'Only Latin letters are allowed in the email',
   })
   email: string;
 
@@ -34,7 +34,7 @@ export class CreateUserDto {
     minUppercase: 1,
   })
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin latters in password',
+    message: 'Only Latin letters are allowed in the password',
   })
   @Matches(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])((?=.*\W)|(?=.*_))^[^ ]+$/, {
     message:
