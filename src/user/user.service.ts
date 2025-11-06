@@ -22,7 +22,7 @@ export class UserService {
   }
 
   async findOneById(id: number): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
@@ -52,7 +52,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException('This user was not found');
+      throw new NotFoundException('This user was not found');
     }
     if (updateUserDto.email) {
       user.email = updateUserDto.email;
@@ -65,7 +65,17 @@ export class UserService {
     return user;
   }
 
-  async deleteUser() {
-    //  add logic here
+  async deleteUser(id: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('This user was not found');
+    }
+    await this.userRepository.delete(id);
+    return { message: 'the user was succesfully deleted' };
   }
 }

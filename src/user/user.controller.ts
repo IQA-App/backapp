@@ -29,8 +29,8 @@ export class UserController {
   }
 
   @Get(':id')
-  findOneById(@Param('id', ParseIntPipe) id: number) {
-    const user = this.userService.findOneById(id);
+  async findOneById(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.userService.findOneById(id);
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -40,19 +40,19 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto);
+  async createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    return await this.userService.createUser(createUserDto);
   }
 
   @Patch(':id')
-  updateUser(
+  async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Req() req,
     @Body(ValidationPipe)
     updateUserDto: UpdateUserDto,
   ) {
-    const requestId = req.params.id;
-    const body = req.body;
+    const requestId = await req.params.id;
+    const body = await req.body;
 
     if (isNaN(requestId)) {
       throw new BadRequestException('id must be a number');
@@ -70,8 +70,13 @@ export class UserController {
     return this.userService.updateUser(+id, updateUserDto);
   }
 
-  @Delete()
-  deleteUser() {
-    return 'User was deleted !';
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number) {
+    const user = await this.userService.findOneById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return this.userService.deleteUser(id);
   }
 }
