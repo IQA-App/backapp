@@ -22,12 +22,23 @@ export class UserService {
     return users;
   }
 
-  async findOneById(id: number): Promise<User> {
+  async findOneById(id: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return user;
+  }
+
+  async findUserByUserName(email: string): Promise<User | undefined> {
+    const requestedEmail = await this.userRepository.findOneBy({
+      email: email,
+    });
+    if (!requestedEmail) {
+      throw new NotFoundException('This username not found');
+    }
+
+    return requestedEmail;
   }
 
   async createUser(createUserDto: CreateUserDto) {
@@ -48,7 +59,7 @@ export class UserService {
     return { user };
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({
       where: {
         id,
@@ -69,7 +80,7 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     const user = await this.userRepository.findOne({
       where: {
         id,

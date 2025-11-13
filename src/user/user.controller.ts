@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOneById(@Param('id', ParseIntPipe) id: number) {
+  async findOneById(@Param('id', ParseIntPipe) id: string) {
     const user = await this.userService.findOneById(id);
 
     if (!user) {
@@ -46,7 +46,7 @@ export class UserController {
 
   @Patch(':id')
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Req() req,
     @Body(ValidationPipe)
     updateUserDto: UpdateUserDto,
@@ -54,9 +54,10 @@ export class UserController {
     const requestId = await req.params.id;
     const body = await req.body;
 
-    if (isNaN(requestId)) {
-      throw new BadRequestException('id must be a number');
-    }
+    // if (isNaN(requestId)) {
+    //   throw new BadRequestException('id must be a number');
+    // }
+
     if (!body) {
       throw new BadRequestException('body can not be empty');
     }
@@ -67,11 +68,11 @@ export class UserController {
       throw new BadRequestException('password can not be empty');
     }
 
-    return this.userService.updateUser(+id, updateUserDto);
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: string) {
     const user = await this.userService.findOneById(id);
 
     if (!user) {
