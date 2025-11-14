@@ -11,7 +11,8 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     HealthModule,
     UserModule,
-    ConfigModule.forRoot(),
+    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
