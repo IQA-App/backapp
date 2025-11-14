@@ -14,7 +14,7 @@ import {
 import { PartialType } from '@nestjs/mapped-types';
 import { Role } from 'src/user/role.enum';
 
-export class CreateOrdersDto {
+export class CreateOrderDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
@@ -32,7 +32,4 @@ export class CreateOrdersDto {
     message: 'Only Latin letters are allowed in the password',
   })
   request: string;
-
-
-  
 }
