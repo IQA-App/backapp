@@ -74,8 +74,12 @@ export class UserService {
     if (updateUserDto.email) {
       user.email = updateUserDto.email;
     }
+
     if (updateUserDto.password) {
-      user.password = updateUserDto.password;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, salt);
+
+      user.password = hashedPassword;
     }
     await this.userRepository.save(user);
 
