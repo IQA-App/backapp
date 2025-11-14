@@ -1,5 +1,5 @@
 # Base image
-FROM node:18
+FROM node:22
 
 
 ARG JWT_SECRET
