@@ -8,12 +8,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findAllUsers() {
@@ -21,12 +24,23 @@ export class UserService {
     return users;
   }
 
-  async findOneById(id: number): Promise<User> {
+  async findOneById(id: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return user;
+  }
+
+  async findUserByUserName(email: string): Promise<User | undefined> {
+    const requestedEmail = await this.userRepository.findOneBy({
+      email: email,
+    });
+    if (!requestedEmail) {
+      throw new NotFoundException('This username not found');
+    }
+
+    return requestedEmail;
   }
 
   async createUser(createUserDto: CreateUserDto) {
@@ -36,15 +50,18 @@ export class UserService {
       },
     });
     if (existUser) throw new BadRequestException('This email already exists!');
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     const user = await this.userRepository.save({
       email: createUserDto.email,
-      password: createUserDto.password,
+      password: hashedPassword,
     });
-
-    return { user };
+    const token = this.jwtService.sign({ email: createUserDto.email });
+    return { user, token };
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({
       where: {
         id,
@@ -57,15 +74,19 @@ export class UserService {
     if (updateUserDto.email) {
       user.email = updateUserDto.email;
     }
+
     if (updateUserDto.password) {
-      user.password = updateUserDto.password;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, salt);
+
+      user.password = hashedPassword;
     }
     await this.userRepository.save(user);
 
     return user;
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     const user = await this.userRepository.findOne({
       where: {
         id,
