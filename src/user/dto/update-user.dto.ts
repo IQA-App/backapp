@@ -22,7 +22,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   email: string;
 
   @IsNotEmpty()
-  @IsString()1
+  @IsString()
   @MinLength(8)
   @MaxLength(18)
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
