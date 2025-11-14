@@ -57,21 +57,36 @@ export class UserService {
       email: createUserDto.email,
       password: hashedPassword,
     });
-    const token = this.jwtService.sign({ email: createUserDto.email });
+    const dateMap = new Date('1983-01-01');
+    const token = this.jwtService.sign({
+      email: createUserDto.email,
+      id: user.id,
+      role: user.role,
+      userMapId: dateMap,
+    });
     return { user, token };
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (!user) {
       throw new NotFoundException('This user was not found');
     }
+
+    // check if the email exists
     if (updateUserDto.email) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: updateUserDto.email },
+      });
+
+      // check if a new email already taken
+      if (existingUser && existingUser.id !== id) {
+        throw new BadRequestException('Email is already in use');
+      }
+
       user.email = updateUserDto.email;
     }
 
