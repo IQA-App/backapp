@@ -13,10 +13,13 @@ import {
   Patch,
   Req,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 // import {CreateUserDto} from
 
 @Controller('user')
@@ -28,6 +31,7 @@ export class UserController {
     return this.userService.findAllUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOneById(@Param('id', ParseIntPipe) id: string) {
     const user = await this.userService.findOneById(id);
@@ -53,10 +57,6 @@ export class UserController {
   ) {
     const requestId = await req.params.id;
     const body = await req.body;
-
-    // if (isNaN(requestId)) {
-    //   throw new BadRequestException('id must be a number');
-    // }
 
     if (!body) {
       throw new BadRequestException('body can not be empty');

@@ -27,18 +27,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // const accessToken = this.jwtService.signAsync({ id: user.id });
-
     return user;
-
-    // const payload = { sub: user.userId, username: user.username };
-    // return {
-    //   access_token: await this.jwtService.signAsync(payload),
-    // };
   }
 
   async login(user: IUser) {
-    const dateMap = Date.now();
+    const dateMap = new Date('1983-01-01');
     const { id, email } = user;
     return {
       id,
