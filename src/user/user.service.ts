@@ -9,12 +9,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findAllUsers() {
@@ -55,8 +57,8 @@ export class UserService {
       email: createUserDto.email,
       password: hashedPassword,
     });
-
-    return { user };
+    const token = this.jwtService.sign({ email: createUserDto.email });
+    return { user, token };
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
