@@ -6,12 +6,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
     HealthModule,
     UserModule,
     AuthModule,
+    OrdersModule,
+    AuthModule,
+    OrdersModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,7 +31,6 @@ import { AuthModule } from './auth/auth.module';
         synchronize: true, //  do not use true for the prod
       }),
     }),
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
