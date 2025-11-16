@@ -1,16 +1,18 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({ name: 'order' })
+@Entity({ name: 'orders' })
 export class Order {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
-  @Column()
+  @Column({ unique: true })
   title: string;
 
   //   @Date()
@@ -18,8 +20,8 @@ export class Order {
   createdAt: Date;
 
   @Column()
-  customerEmail: string;
+  description: string;
 
-  @Column()
-  request: string;
+  @ManyToOne(() => User, (user) => user.orders, { eager: false })
+  user: User;
 }
