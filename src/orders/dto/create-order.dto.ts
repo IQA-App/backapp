@@ -29,7 +29,7 @@ export class CreateOrderDto {
   @MinLength(8)
   @MaxLength(1000)
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the password',
+    message: 'Only Latin letters are allowed in the order description',
   })
-  request: string;
+  description: string;
 }
