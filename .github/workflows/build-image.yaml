@@ -47,17 +47,37 @@ jobs:
         
   prod:
     runs-on: ubuntu-latest
-    name: "DEV deploy"
+    name: "PROD deploy"
     needs: build
 
     steps:
-      - name: Deploy
-        run: ""
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Restart deployment
+        env:
+          KUBE_DEPLOYMENT_NAME: backapp
+          KUBE_NAMESPACE: dev
+        run: |
+          DEPLOYMENT_NAME=${KUBE_DEPLOYMENT_NAME:-backapp}
+          NAMESPACE=${KUBE_NAMESPACE:-default}
+          
+          kubectl rollout restart deployment/$DEPLOYMENT_NAME --namespace=$NAMESPACE
+          kubectl rollout status deployment/$DEPLOYMENT_NAME --namespace=$NAMESPACE --timeout=5m
   test:
     runs-on: ubuntu-latest
-    name: "DEV test"
+    name: "PROD test"
     needs: [build, prod]
 
     steps:
       - name: Deploy
-        run: ""
+        run: "echo 'Testing PROD'"
+
