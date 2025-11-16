@@ -12,7 +12,7 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   title: string;
 
   //   @Date()
