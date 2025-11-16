@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -22,18 +23,32 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   async create(@Req() req, @Body() createOrderDto: CreateOrderDto) {
     const userId = await req.user.id; // getting userId from token
-    console.log('=== REQ ====', userId);
+    const userRole = await req.user.role; //  we will use this in future features
+
     return await this.ordersService.createOrder(createOrderDto, userId);
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Req() req) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return await this.ordersService.findAllorders(userRole, userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  @Get(':lookUpId')
+  @UseGuards(JwtAuthGuard)
+  async findOne(
+    @Req()
+    req,
+    @Param('lookUpId', ParseIntPipe)
+    lookUpId: string,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return this.ordersService.findOneOrderById(lookUpId, userId, userRole);
   }
 
   @Patch(':id')

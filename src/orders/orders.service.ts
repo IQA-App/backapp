@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,6 +31,7 @@ export class OrdersService {
       throw new BadRequestException('The order with this title already exists');
     }
 
+    // we may use this later
     // const order = new Order();
     // order.title = createOrderDto.title;
     // order.description = createOrderDto.description;
@@ -40,12 +46,40 @@ export class OrdersService {
     return await this.orderRepository.save(order);
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async findAllorders(userRole: string, userId: string) {
+    if (userRole === 'admin') {
+      const orders = await this.orderRepository.find();
+      return orders;
+    } else {
+      const orders = await this.orderRepository.find({
+        where: {
+          user: { id: userId }, // bcz entity order.entity  user: User;
+        },
+      });
+      return orders;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOneOrderById(lookUpId: string, userId: string, userRole: string) {
+    if (userRole === 'admin') {
+      const order = await this.orderRepository.findOne({
+        where: { id: lookUpId },
+      });
+      if (!order) {
+        throw new NotFoundException();
+      }
+      return order;
+    } else {
+      //  this returns 200 [] for now its ok bc we dont have to tell customer
+      //  if specific(not created by this customer) order exists or no
+      const order = await this.orderRepository.find({
+        where: {
+          id: lookUpId,
+          user: { id: userId },
+        },
+      });
+      return order;
+    }
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
