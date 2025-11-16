@@ -97,7 +97,18 @@ export class OrdersService {
     return await this.orderRepository.save(order);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async deleteOrder(lookUpId: string, userId: string, userRole: string) {
+    const order = await this.orderRepository.findOne({
+      where:
+        userRole === 'admin'
+          ? { id: lookUpId }
+          : { id: lookUpId, user: { id: userId } },
+    });
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    await this.orderRepository.delete(lookUpId);
+    return { message: 'the user was succesfully deleted' };
   }
 }

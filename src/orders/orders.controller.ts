@@ -76,8 +76,16 @@ export class OrdersController {
     );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  @Delete(':lookUpId')
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @Param('lookUpId', ValidationPipe) lookUpId: string,
+    @Req()
+    req,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return this.ordersService.deleteOrder(lookUpId, userId, userRole);
   }
 }
