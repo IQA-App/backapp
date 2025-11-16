@@ -13,6 +13,9 @@ import { OrdersModule } from './orders/orders.module';
     HealthModule,
     UserModule,
     AuthModule,
+    OrdersModule,
+    AuthModule,
+    OrdersModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -28,8 +31,6 @@ import { OrdersModule } from './orders/orders.module';
         synchronize: true, //  do not use true for the prod
       }),
     }),
-    AuthModule,
-    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
