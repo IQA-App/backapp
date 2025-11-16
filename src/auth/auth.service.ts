@@ -32,10 +32,11 @@ export class AuthService {
 
   async login(user: IUser) {
     const dateMap = new Date('1983-01-01');
-    const { id, email } = user;
+    const { id, email, role } = user;
     return {
       id,
       email,
+      role,
       access_token: this.jwtService.sign({
         id: user.id,
         email: user.email,
