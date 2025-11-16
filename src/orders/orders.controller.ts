@@ -9,6 +9,8 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  BadRequestException,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -21,7 +23,10 @@ export class OrdersController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Req() req, @Body() createOrderDto: CreateOrderDto) {
+  async create(
+    @Req() req,
+    @Body(ValidationPipe) createOrderDto: CreateOrderDto,
+  ) {
     const userId = await req.user.id; // getting userId from token
     const userRole = await req.user.role; //  we will use this in future features
 
@@ -34,7 +39,7 @@ export class OrdersController {
     const userId = await req.user.id;
     const userRole = await req.user.role;
 
-    return await this.ordersService.findAllorders(userRole, userId);
+    return await this.ordersService.findAllOrders(userRole, userId);
   }
 
   @Get(':lookUpId')
@@ -51,9 +56,24 @@ export class OrdersController {
     return this.ordersService.findOneOrderById(lookUpId, userId, userRole);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  @Patch(':lookUpId')
+  @UseGuards(JwtAuthGuard)
+  async aupdate(
+    @Param('lookUpId') lookUpId: string,
+    @Req()
+    req,
+    @Body(ValidationPipe)
+    updateOrderDto: UpdateOrderDto,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return await this.ordersService.updateOrder(
+      lookUpId,
+      userId,
+      userRole,
+      updateOrderDto,
+    );
   }
 
   @Delete(':id')

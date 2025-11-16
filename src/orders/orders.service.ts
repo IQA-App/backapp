@@ -46,7 +46,7 @@ export class OrdersService {
     return await this.orderRepository.save(order);
   }
 
-  async findAllorders(userRole: string, userId: string) {
+  async findAllOrders(userRole: string, userId: string) {
     if (userRole === 'admin') {
       const orders = await this.orderRepository.find();
       return orders;
@@ -61,29 +61,40 @@ export class OrdersService {
   }
 
   async findOneOrderById(lookUpId: string, userId: string, userRole: string) {
-    if (userRole === 'admin') {
-      const order = await this.orderRepository.findOne({
-        where: { id: lookUpId },
-      });
-      if (!order) {
-        throw new NotFoundException();
-      }
-      return order;
-    } else {
-      //  this returns 200 [] for now its ok bc we dont have to tell customer
-      //  if specific(not created by this customer) order exists or no
-      const order = await this.orderRepository.find({
-        where: {
-          id: lookUpId,
-          user: { id: userId },
-        },
-      });
-      return order;
+    const order = await this.orderRepository.findOne({
+      where:
+        userRole === 'admin'
+          ? { id: lookUpId } //  admin can see all orders
+          : { id: lookUpId, user: { id: userId } }, //  customer can see only own orders
+    });
+    if (!order) {
+      throw new NotFoundException();
     }
+
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async updateOrder(
+    lookUpId: string,
+    userId: string,
+    userRole: string,
+    updateOrderDto: UpdateOrderDto,
+  ) {
+    const order = await this.orderRepository.findOne({
+      where:
+        userRole === 'admin'
+          ? { id: lookUpId }
+          : { id: lookUpId, user: { id: userId } },
+    });
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    if (updateOrderDto.description !== undefined) {
+      order.description = updateOrderDto.description;
+    }
+
+    return await this.orderRepository.save(order);
   }
 
   remove(id: number) {
