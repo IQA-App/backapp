@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,15 +20,29 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async findAllUsers() {
+  async findAllUsers(userRole: string) {
+    if (userRole !== 'admin') {
+      throw new ForbiddenException();
+    }
     const users = await this.userRepository.find();
     return users;
   }
 
-  async findOneById(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async findOneById(
+    lookUpId: string,
+    userId: string,
+    userRole: string,
+  ): Promise<User> {
+    if (userRole !== 'admin' && lookUpId !== userId) {
+      throw new ForbiddenException();
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: lookUpId },
+    });
+
     if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException(`User with id ${lookUpId} not found`);
     }
     return user;
   }
@@ -67,9 +82,17 @@ export class UserService {
     return { user, token };
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(
+    lookUpId: string,
+    userId: string,
+    updateUserDto: UpdateUserDto,
+  ) {
+    if (lookUpId !== userId) {
+      throw new ForbiddenException();
+    }
+
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -83,7 +106,7 @@ export class UserService {
       });
 
       // check if a new email already taken
-      if (existingUser && existingUser.id !== id) {
+      if (existingUser && existingUser.id !== userId) {
         throw new BadRequestException('Email is already in use');
       }
 
@@ -101,17 +124,27 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(lookUpId: string, userId: string) {
+    console.log('=== REQ lookup and userId ===', lookUpId, userId);
+    console.log(
+      '=== REQ lookup and userId2 ===',
+      typeof lookUpId,
+      typeof userId,
+    );
+    if (lookUpId !== userId) {
+      throw new ForbiddenException();
+    }
+
     const user = await this.userRepository.findOne({
       where: {
-        id,
+        id: userId,
       },
     });
 
     if (!user) {
       throw new NotFoundException('This user was not found');
     }
-    await this.userRepository.delete(id);
+    await this.userRepository.delete(userId);
     return { message: 'the user was succesfully deleted' };
   }
 }
