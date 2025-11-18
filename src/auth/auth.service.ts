@@ -34,7 +34,7 @@ export class AuthService {
     const dateMap = new Date('1983-01-01');
     const { id, email, role } = user;
     return {
-      id,
+      id: String(id),
       email,
       role,
       access_token: this.jwtService.sign({

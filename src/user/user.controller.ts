@@ -26,20 +26,28 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  findAllUsers() {
-    return this.userService.findAllUsers();
+  @UseGuards(JwtAuthGuard)
+  async findAllUsers(
+    @Req()
+    req,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return this.userService.findAllUsers(userRole);
   }
 
-  @Get(':id')
+  @Get(':lookUpId')
   @UseGuards(JwtAuthGuard)
-  async findOneById(@Param('id', ParseIntPipe) id: string) {
-    const user = await this.userService.findOneById(id);
+  async findOneById(
+    @Param('lookUpId', ParseIntPipe) lookUpId: string,
+    @Req()
+    req,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
 
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-
-    return user;
+    return await this.userService.findOneById(lookUpId, userId, userRole);
   }
 
   @Post()
@@ -47,15 +55,15 @@ export class UserController {
     return await this.userService.createUser(createUserDto);
   }
 
-  @Patch(':id')
+  @Patch(':lookUpId')
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('lookUpId', ParseIntPipe) lookUpId: string,
     @Req() req,
     @Body(ValidationPipe)
     updateUserDto: UpdateUserDto,
   ) {
-    const requestId = await req.params.id;
+    const userId = await req.user.id;
     const body = await req.body;
 
     if (!body) {
@@ -68,17 +76,14 @@ export class UserController {
       throw new BadRequestException('password can not be empty');
     }
 
-    return this.userService.updateUser(id, updateUserDto);
+    return this.userService.updateUser(lookUpId, userId, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete(':lookUpId')
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@Param('id') id: string) {
-    const user = await this.userService.findOneById(id);
+  async deleteUser(@Param('lookUpId') lookUpId: string, @Req() req) {
+    const userId = await req.user.id.toString(); //  we have to change this covertion to string in future tickets with uuid
 
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    return this.userService.deleteUser(id);
+    return await this.userService.deleteUser(lookUpId, userId);
   }
 }
