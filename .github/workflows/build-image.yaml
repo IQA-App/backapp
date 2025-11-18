@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -46,7 +46,7 @@ jobs:
         run: docker images
         
   prod:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     name: "PROD deploy"
     needs: build
 
