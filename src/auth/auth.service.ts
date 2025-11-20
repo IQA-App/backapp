@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -77,13 +78,23 @@ export class AuthService {
       throw new NotFoundException('Invalid email');
     }
 
+    const codes = await this.codeRepository.find({
+      where: {
+        email: forgotPasswordDto.email,
+        user: { id: user.id },
+      },
+    });
+
+    // deletes all confirmation codes for this user
+    await this.codeRepository.delete({ user: { id: user.id } });
+
+    // save a brand new confirmation code, so only one code in db at this moment
+    // with status pending
     await this.codeRepository.save({
       email: forgotPasswordDto.email,
       code: code.toString(),
       user: { id: user.id },
     });
-    //  need to add some logic to exprie codes and remove if more than
-    //  one code for the same user
 
     const resetPassword = await this.emailSendingService.sendResetPassword(
       forgotPasswordDto.email,
@@ -120,6 +131,23 @@ export class AuthService {
     code.status = CodeStatus.Used; //  once password was  updated make codeStatus=used also need delet used code
     await this.codeRepository.save(code);
 
+    // deletes confirmation code after changing password since it already used
+    await this.codeRepository.delete({
+      email: resetPasswordDto.email,
+      user: { id: user.id },
+    });
+
     return user;
+  }
+
+  async getAllCodes(userId: string, userRole: string) {
+    //  not sure if we need this feature
+    if (userRole !== 'admin') {
+      throw new ForbiddenException();
+    }
+
+    const codes = await this.codeRepository.find();
+
+    return codes;
   }
 }

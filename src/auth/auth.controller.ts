@@ -9,6 +9,7 @@ import {
   Get,
   ValidationPipe,
   Patch,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -45,5 +46,17 @@ export class AuthController {
     @Body(ValidationPipe) resetPasswordDto: ResetPasswordDto,
   ) {
     return await this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Get('all-codes')
+  @UseGuards(JwtAuthGuard)
+  async getAllCodes(
+    @Req()
+    req,
+  ) {
+    const userId = await req.user.id;
+    const userRole = await req.user.role;
+
+    return await this.authService.getAllCodes(userId, userRole);
   }
 }
