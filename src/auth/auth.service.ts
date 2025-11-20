@@ -1,19 +1,39 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+
+import * as bcrypt from 'bcryptjs';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
-import * as bcrypt from 'bcryptjs';
 import { IUser } from 'src/types/types';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Repository } from 'typeorm';
+import { EmailSendingService } from 'src/email-service/email-sending.service';
+import { Codes } from './entities/confirmation-code.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CodeStatus } from './code-status.enum';
+
+function generateConfirmCode(): number {
+  return Math.floor(100000 + Math.random() * 900000);
+}
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(Codes)
+    private readonly codeRepository: Repository<Codes>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
     private userService: UserService,
     private jwtService: JwtService,
+    private emailSendingService: EmailSendingService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User> {
@@ -44,5 +64,62 @@ export class AuthService {
         userMapId: dateMap,
       }),
     };
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const code = generateConfirmCode().toString();
+
+    const user = await this.userService.findUserByUserName(
+      forgotPasswordDto.email,
+    );
+
+    if (!user) {
+      throw new NotFoundException('Invalid email');
+    }
+
+    await this.codeRepository.save({
+      email: forgotPasswordDto.email,
+      code: code.toString(),
+      user: { id: user.id },
+    });
+    //  need to add some logic to exprie codes and remove if more than
+    //  one code for the same user
+
+    const resetPassword = await this.emailSendingService.sendResetPassword(
+      forgotPasswordDto.email,
+      code,
+    );
+
+    return { resetPassword };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const code = await this.codeRepository.findOne({
+      where: {
+        code: resetPasswordDto.confirmationCode,
+      },
+    });
+
+    const user = await this.userRepository.findOne({
+      where: { email: resetPasswordDto.email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('This user was not found');
+    }
+    if (!code) {
+      throw new NotFoundException('Invalid code');
+    }
+    if (resetPasswordDto.newPassword !== resetPasswordDto.confirmPassword) {
+      throw new BadRequestException('Passwords must be the same');
+    }
+
+    user.password = resetPasswordDto.confirmPassword;
+    await this.userRepository.save(user);
+
+    code.status = CodeStatus.Used; //  once password was  updated make codeStatus=used also need delet used code
+    await this.codeRepository.save(code);
+
+    return user;
   }
 }
