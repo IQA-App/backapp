@@ -137,7 +137,9 @@ export class AuthService {
       user: { id: user.id },
     });
 
-    return user;
+    return {
+      message: 'Password has been reset successfully',
+    };
   }
 
   async getAllCodes(userId: string, userRole: string) {

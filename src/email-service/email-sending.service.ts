@@ -24,7 +24,7 @@ export class EmailSendingService {
         },
       });
       const info: SentMessageInfo = await transporter.sendMail({
-        from: `IQA-Project-Two <${process.env.ETHEREAL_USER}>`,
+        from: `IQA-Project-Two <no-replay@iqa.project-two.com>`,
         to: toEmail,
         subject: 'confirmation code',
         text: `Hi ${toEmail} ! 👋 your code is :${code}`,
@@ -34,7 +34,7 @@ export class EmailSendingService {
       console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
       const previewUrl = nodemailer.getTestMessageUrl(info);
 
-      return { previewUrl, messageId: info.messageId };
+      return { 'Link with your code: ': previewUrl, messageId: info.messageId };
     } catch (err: any) {
       console.error('EMAIL SENDING error:', err);
       throw err;
