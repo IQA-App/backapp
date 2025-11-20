@@ -19,6 +19,9 @@ export class Codes {
   @CreateDateColumn()
   createdAt: Date;
 
+  // @Column({ type: 'datetime2'})
+  // expiresAt: Date;
+
   @Column()
   email: string;
 
@@ -28,6 +31,6 @@ export class Codes {
   })
   status: CodeStatus;
 
-  @ManyToOne(() => User, (user) => user.orders, { eager: false })
+  @ManyToOne(() => User, (user) => user.codes, { eager: false })
   user: User;
 }
