@@ -125,10 +125,22 @@ export class AuthService {
       throw new BadRequestException('Passwords must be the same');
     }
 
-    user.password = resetPasswordDto.confirmPassword;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(
+      resetPasswordDto.confirmPassword,
+      salt,
+    );
+
+    user.password = hashedPassword;
     await this.userRepository.save(user);
 
     code.status = CodeStatus.Used; //  once password was  updated make codeStatus=used also need delet used code
+
+    // fix later
+    // const expiresAt = new Date();
+    // expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+    // code.expiresAt = expiresAt;
+
     await this.codeRepository.save(code);
 
     // deletes confirmation code after changing password since it already used
