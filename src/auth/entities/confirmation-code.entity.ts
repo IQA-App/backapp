@@ -19,7 +19,8 @@ export class Codes {
   @CreateDateColumn()
   createdAt: Date;
 
-  // @Column({ type: 'datetime2'})
+  // finish later
+  // @Column({ type: 'datetime', nullable: true })
   // expiresAt: Date;
 
   @Column()

@@ -88,12 +88,17 @@ export class AuthService {
     // deletes all confirmation codes for this user
     await this.codeRepository.delete({ user: { id: user.id } });
 
+    //  finish later
+    // const expiresAt = new Date();
+    // expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
     // save a brand new confirmation code, so only one code in db at this moment
     // with status pending
     await this.codeRepository.save({
       email: forgotPasswordDto.email,
       code: code.toString(),
       user: { id: user.id },
+      // expiresAt: expiresAt, // finish later
     });
 
     const forgotPasswordEmailData =
