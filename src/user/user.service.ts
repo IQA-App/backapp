@@ -24,7 +24,9 @@ export class UserService {
     if (userRole !== 'admin') {
       throw new ForbiddenException();
     }
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      select: ['id', 'email', 'role'],
+    });
     return users;
   }
 
@@ -38,12 +40,14 @@ export class UserService {
     }
 
     const user = await this.userRepository.findOne({
+      select: ['id', 'email'],
       where: { id: lookUpId },
     });
 
     if (!user) {
       throw new NotFoundException(`User with id ${lookUpId} not found`);
     }
+
     return user;
   }
 
@@ -79,7 +83,8 @@ export class UserService {
       role: user.role,
       userMapId: dateMap,
     });
-    return { user, token };
+
+    return { user: { id: user.id, email: user.email }, token };
   }
 
   async updateUser(
@@ -92,6 +97,7 @@ export class UserService {
     }
 
     const user = await this.userRepository.findOne({
+      select: ['id', 'email'],
       where: { id: userId },
     });
 
@@ -121,7 +127,10 @@ export class UserService {
     }
     await this.userRepository.save(user);
 
-    return user;
+    return {
+      message: 'The user succcefully updated',
+      userInfo: { id: user.id, email: user.email },
+    };
   }
 
   async deleteUser(lookUpId: string, userId: string) {

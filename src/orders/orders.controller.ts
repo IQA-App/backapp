@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -42,24 +43,24 @@ export class OrdersController {
     return await this.ordersService.findAllOrders(userRole, userId);
   }
 
-  @Get(':lookUpId')
+  @Get(':orderId')
   @UseGuards(JwtAuthGuard)
   async findOne(
     @Req()
     req,
-    @Param('lookUpId', ParseIntPipe)
-    lookUpId: string,
+    @Param('orderId', ParseUUIDPipe)
+    orderId: string,
   ) {
     const userId = await req.user.id;
     const userRole = await req.user.role;
 
-    return this.ordersService.findOneOrderById(lookUpId, userId, userRole);
+    return this.ordersService.findOneOrderById(orderId, userId, userRole);
   }
 
   @Patch(':lookUpId')
   @UseGuards(JwtAuthGuard)
   async aupdate(
-    @Param('lookUpId') lookUpId: string,
+    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
     @Req()
     req,
     @Body(ValidationPipe)
@@ -79,7 +80,7 @@ export class OrdersController {
   @Delete(':lookUpId')
   @UseGuards(JwtAuthGuard)
   async remove(
-    @Param('lookUpId', ValidationPipe) lookUpId: string,
+    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
     @Req()
     req,
   ) {
