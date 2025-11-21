@@ -9,13 +9,12 @@ import {
 
 @Entity({ name: 'orders' })
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   title: string;
 
-  //   @Date()
   @CreateDateColumn()
   createdAt: Date;
 

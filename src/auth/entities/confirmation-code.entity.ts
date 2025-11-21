@@ -10,7 +10,7 @@ import { CodeStatus } from '../code-status.enum';
 
 @Entity({ name: 'codes' })
 export class Codes {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
