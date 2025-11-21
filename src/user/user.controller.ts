@@ -14,6 +14,7 @@ import {
   Req,
   BadRequestException,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -40,7 +41,7 @@ export class UserController {
   @Get(':lookUpId')
   @UseGuards(JwtAuthGuard)
   async findOneById(
-    @Param('lookUpId', ParseIntPipe) lookUpId: string,
+    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
     @Req()
     req,
   ) {
@@ -58,7 +59,7 @@ export class UserController {
   @Patch(':lookUpId')
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Param('lookUpId', ParseIntPipe) lookUpId: string,
+    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
     @Req() req,
     @Body(ValidationPipe)
     updateUserDto: UpdateUserDto,
@@ -81,7 +82,10 @@ export class UserController {
 
   @Delete(':lookUpId')
   @UseGuards(JwtAuthGuard)
-  async deleteUser(@Param('lookUpId') lookUpId: string, @Req() req) {
+  async deleteUser(
+    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Req() req,
+  ) {
     const userId = await req.user.id.toString(); //  we have to change this covertion to string in future tickets with uuid
 
     return await this.userService.deleteUser(lookUpId, userId);

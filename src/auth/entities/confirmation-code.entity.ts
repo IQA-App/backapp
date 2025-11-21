@@ -10,7 +10,7 @@ import { CodeStatus } from '../code-status.enum';
 
 @Entity({ name: 'codes' })
 export class Codes {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -19,7 +19,8 @@ export class Codes {
   @CreateDateColumn()
   createdAt: Date;
 
-  // @Column({ type: 'datetime2'})
+  // finish later
+  // @Column({ type: 'datetime', nullable: true })
   // expiresAt: Date;
 
   @Column()

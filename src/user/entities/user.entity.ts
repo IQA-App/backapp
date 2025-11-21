@@ -5,7 +5,7 @@ import { Codes } from 'src/auth/entities/confirmation-code.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })

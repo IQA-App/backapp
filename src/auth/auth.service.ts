@@ -88,37 +88,48 @@ export class AuthService {
     // deletes all confirmation codes for this user
     await this.codeRepository.delete({ user: { id: user.id } });
 
+    //  finish later
+    // const expiresAt = new Date();
+    // expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
     // save a brand new confirmation code, so only one code in db at this moment
     // with status pending
     await this.codeRepository.save({
       email: forgotPasswordDto.email,
       code: code.toString(),
       user: { id: user.id },
+      // expiresAt: expiresAt, // finish later
     });
 
-    const resetPassword = await this.emailSendingService.sendResetPassword(
-      forgotPasswordDto.email,
-      code,
-    );
+    const forgotPasswordEmailData =
+      await this.emailSendingService.sendResetPassword(
+        forgotPasswordDto.email,
+        code,
+      );
 
-    return { resetPassword };
+    return { forgotPasswordData: forgotPasswordEmailData };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const code = await this.codeRepository.findOne({
-      where: {
-        code: resetPasswordDto.confirmationCode,
-      },
-    });
-
     const user = await this.userRepository.findOne({
       where: { email: resetPasswordDto.email },
+    });
+
+    // find confirmation code assosaited to this user
+    const codeInDb = await this.codeRepository.findOne({
+      where: {
+        user: { id: user.id },
+        email: resetPasswordDto.email,
+      },
     });
 
     if (!user) {
       throw new NotFoundException('This user was not found');
     }
-    if (!code) {
+    if (!codeInDb) {
+      throw new NotFoundException('Code not found');
+    }
+    if (codeInDb.code !== resetPasswordDto.confirmationCode) {
       throw new NotFoundException('Invalid code');
     }
     if (resetPasswordDto.newPassword !== resetPasswordDto.confirmPassword) {
@@ -134,14 +145,13 @@ export class AuthService {
     user.password = hashedPassword;
     await this.userRepository.save(user);
 
-    code.status = CodeStatus.Used; //  once password was  updated make codeStatus=used also need delet used code
+    //  once password was updated, make codeStatus=used also need delet used code
+    codeInDb.status = CodeStatus.Used;
 
     // fix later
     // const expiresAt = new Date();
     // expiresAt.setMinutes(expiresAt.getMinutes() + 10);
     // code.expiresAt = expiresAt;
-
-    await this.codeRepository.save(code);
 
     // deletes confirmation code after changing password since it already used
     await this.codeRepository.delete({

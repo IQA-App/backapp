@@ -60,12 +60,12 @@ export class OrdersService {
     }
   }
 
-  async findOneOrderById(lookUpId: string, userId: string, userRole: string) {
+  async findOneOrderById(orderId: string, userId: string, userRole: string) {
     const order = await this.orderRepository.findOne({
       where:
         userRole === 'admin'
-          ? { id: lookUpId } //  admin can see all orders
-          : { id: lookUpId, user: { id: userId } }, //  customer can see only own orders
+          ? { id: orderId } //  admin can see all orders
+          : { id: orderId, user: { id: userId } }, //  customer can see only own orders
     });
     if (!order) {
       throw new NotFoundException();
