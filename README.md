@@ -43,6 +43,8 @@ $ npm install
 - install typeorm with mssql on your machine + UI db tool e.g. dbVievwer
 - setup db connection to Nest JS. one of such video [some example](https://www.youtube.com/watch?v=pI9C7NH4K5c)
 - setup Authetification JWT [example](https://www.youtube.com/watch?v=n7PjVqKspuA&list=PLkUJHNMBzmtQj5qvTCqn0uMXFDG4ENiwf&index=6)
+- setup fake email service. we send emails to ourselfs [example](https://nodemailer.com/)
+- [example forgto and reset password](https://www.youtube.com/watch?v=Ts63ER4aExk&list=PLjN859gLfipmbdoKeI61oQVVBBPruuXMY&index=4)
 
 ## Compile and run the project
 

@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
+import { EmailServiceModule } from './email-service/email-service.module';
 
 @Module({
   imports: [
@@ -16,12 +17,14 @@ import { OrdersModule } from './orders/orders.module';
     OrdersModule,
     AuthModule,
     OrdersModule,
+    EmailServiceModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mssql',
+        // type: 'sqlite', //  for local testing only
         host: configService.get('DB_HOST'),
         port: +configService.get('DB_PORT'),
         username: configService.get('DB_USERNAME'),
