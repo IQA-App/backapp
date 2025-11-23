@@ -59,7 +59,7 @@ jobs:
       - name: Restart deployment
         env:
           KUBE_DEPLOYMENT_NAME: backapp
-          KUBE_NAMESPACE: dev
+          KUBE_NAMESPACE: default
         run: |
           DEPLOYMENT_NAME=${KUBE_DEPLOYMENT_NAME:-backapp}
           NAMESPACE=${KUBE_NAMESPACE:-default}
