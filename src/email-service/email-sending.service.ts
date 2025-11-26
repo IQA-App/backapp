@@ -9,8 +9,14 @@ import { env } from 'process';
 @Injectable()
 export class EmailSendingService {
   private transporter: Transporter;
+
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
+      debugger: true,
+      connectionTimeout: 150000,
+      greetingTimeout: 60000,
+      socketTimeout: 600000,
+      dnsTimeout: 60000,
       host: 'app.debugmail.io',
       port: 25,
       secure: false,
@@ -25,6 +31,7 @@ export class EmailSendingService {
       },
       tls: {
         ciphers: 'SSLv3',
+        rejectUnauthorized: false,
       },
     });
   }
