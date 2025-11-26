@@ -23,70 +23,45 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(
     @Req() req,
     @Body(ValidationPipe) createOrderDto: CreateOrderDto,
   ) {
-    const userId = await req.user.id; // getting userId from token
-    const userRole = await req.user.role; //  we will use this in future features
-
-    return await this.ordersService.createOrder(createOrderDto, userId);
+    return await this.ordersService.createOrder(createOrderDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(@Req() req) {
-    const userId = await req.user.id;
-    const userRole = await req.user.role;
-
-    return await this.ordersService.findAllOrders(userRole, userId);
+    return await this.ordersService.findAllOrders();
   }
 
-  @Get(':orderId')
-  @UseGuards(JwtAuthGuard)
+  @Get(':id')
   async findOne(
     @Req()
     req,
-    @Param('orderId', ParseUUIDPipe)
-    orderId: string,
+    @Param('id', ParseUUIDPipe)
+    id: string,
   ) {
-    const userId = await req.user.id;
-    const userRole = await req.user.role;
-
-    return this.ordersService.findOneOrderById(orderId, userId, userRole);
+    return this.ordersService.findOneOrderById(id);
   }
 
-  @Patch(':lookUpId')
-  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
   async aupdate(
-    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req()
     req,
     @Body(ValidationPipe)
     updateOrderDto: UpdateOrderDto,
   ) {
-    const userId = await req.user.id;
-    const userRole = await req.user.role;
-
-    return await this.ordersService.updateOrder(
-      lookUpId,
-      userId,
-      userRole,
-      updateOrderDto,
-    );
+    return await this.ordersService.updateOrder(id, updateOrderDto);
   }
 
-  @Delete(':lookUpId')
-  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
   async remove(
-    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Req()
     req,
   ) {
-    const userId = await req.user.id;
-    const userRole = await req.user.role;
-
-    return this.ordersService.deleteOrder(lookUpId, userId, userRole);
+    return this.ordersService.deleteOrder(id);
   }
 }

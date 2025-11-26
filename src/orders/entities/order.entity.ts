@@ -21,6 +21,9 @@ export class Order {
   @Column()
   description: string;
 
-  @ManyToOne(() => User, (user) => user.orders, { eager: false })
-  user: User;
+  @ManyToOne(() => User, (user) => user.orders, {
+    eager: false,
+    nullable: true,
+  })
+  user?: User;
 }
