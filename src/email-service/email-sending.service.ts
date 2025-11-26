@@ -34,8 +34,8 @@ export class EmailSendingService {
         maxConnections: 5, // optional – defaults to 5
         maxMessages: 100, // optional – defaults to 100
         auth: {
-          user: process.env.DEBUGMAIL_USER,
-          pass: process.env.DEBUGMAIL_PASS,
+          user: process.env.EMAIL_TRANSPORT_USER,
+          pass: process.env.EMAIL_TRANSPORT_PASSWORD,
         },
         tls: {
           ciphers: 'SSLv3',
