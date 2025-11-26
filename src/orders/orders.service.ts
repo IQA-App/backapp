@@ -19,11 +19,10 @@ export class OrdersService {
     // private readonly jwtService: JwtService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto, userId: string) {
+  async createOrder(createOrderDto: CreateOrderDto) {
     const existOrder = await this.orderRepository.findOne({
       where: {
         title: createOrderDto.title,
-        user: { id: userId }, // bcz entity order.entity  user: User;
       },
     });
 
@@ -40,51 +39,31 @@ export class OrdersService {
     const order = this.orderRepository.create({
       title: createOrderDto.title,
       description: createOrderDto.description,
-      user: { id: userId },
+      // user: { id: userId },  // figure out in the future tickets
     });
 
     return await this.orderRepository.save(order);
   }
 
-  async findAllOrders(userRole: string, userId: string) {
-    if (userRole === 'admin') {
-      const orders = await this.orderRepository.find();
-      return orders;
-    } else {
-      const orders = await this.orderRepository.find({
-        where: {
-          user: { id: userId }, // bcz entity order.entity  user: User;
-        },
-      });
-      return orders;
-    }
+  async findAllOrders() {
+    const orders = await this.orderRepository.find();
+    return orders;
   }
 
-  async findOneOrderById(orderId: string, userId: string, userRole: string) {
+  async findOneOrderById(id: string) {
     const order = await this.orderRepository.findOne({
-      where:
-        userRole === 'admin'
-          ? { id: orderId } //  admin can see all orders
-          : { id: orderId, user: { id: userId } }, //  customer can see only own orders
+      where: { id: id },
     });
     if (!order) {
-      throw new NotFoundException();
+      throw new NotFoundException('order not found');
     }
 
     return order;
   }
 
-  async updateOrder(
-    lookUpId: string,
-    userId: string,
-    userRole: string,
-    updateOrderDto: UpdateOrderDto,
-  ) {
+  async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
     const order = await this.orderRepository.findOne({
-      where:
-        userRole === 'admin'
-          ? { id: lookUpId }
-          : { id: lookUpId, user: { id: userId } },
+      where: { id: id },
     });
     if (!order) {
       throw new NotFoundException();
@@ -97,18 +76,15 @@ export class OrdersService {
     return await this.orderRepository.save(order);
   }
 
-  async deleteOrder(lookUpId: string, userId: string, userRole: string) {
+  async deleteOrder(id: string) {
     const order = await this.orderRepository.findOne({
-      where:
-        userRole === 'admin'
-          ? { id: lookUpId }
-          : { id: lookUpId, user: { id: userId } },
+      where: { id: id },
     });
     if (!order) {
       throw new NotFoundException();
     }
 
-    await this.orderRepository.delete(lookUpId);
+    await this.orderRepository.delete(id);
     return { message: 'the user was succesfully deleted' };
   }
 }
