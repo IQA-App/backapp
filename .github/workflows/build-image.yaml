@@ -36,6 +36,8 @@ jobs:
                         --build-arg "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
                         --build-arg "DB_NAME=${{ secrets.DB_NAME }}" \
                         --build-arg "SERVERPORT=${{ secrets.SERVERPORT }}" \
+                        --build-arg "EMAIL_TRANSPORT_USER=${{ secrets.EMAIL_TRANSPORT_USER }}" \
+                        --build-arg "EMAIL_TRANSPORT_PASSWORD=${{ secrets.EMAIL_TRANSPORT_PASSWORD }}" \
                         --no-cache \
                         -t iqaapp/backapp:latest \
                         .
