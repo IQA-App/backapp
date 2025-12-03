@@ -21,12 +21,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
   async findAllUsers(
     @Req()
@@ -38,10 +42,12 @@ export class UserController {
     return this.userService.findAllUsers(userRole);
   }
 
-  @Get(':lookUpId')
+  @Get(':id')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
   async findOneById(
-    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Param('id', ParseUUIDPipe) lookUpId: string,
     @Req()
     req,
   ) {
@@ -56,10 +62,11 @@ export class UserController {
     return await this.userService.createUser(createUserDto);
   }
 
-  @Patch(':lookUpId')
+  @Patch(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Param('id', ParseUUIDPipe) lookUpId: string,
     @Req() req,
     @Body(ValidationPipe)
     updateUserDto: UpdateUserDto,
@@ -80,10 +87,11 @@ export class UserController {
     return this.userService.updateUser(lookUpId, userId, updateUserDto);
   }
 
-  @Delete(':lookUpId')
+  @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async deleteUser(
-    @Param('lookUpId', ParseUUIDPipe) lookUpId: string,
+    @Param('id', ParseUUIDPipe) lookUpId: string,
     @Req() req,
   ) {
     const userId = await req.user.id.toString(); //  we have to change this covertion to string in future tickets with uuid

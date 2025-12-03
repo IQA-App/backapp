@@ -11,8 +11,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @ApiProperty({ example: 'test@test.com' })
   @IsNotEmpty()
   @IsString()
   @IsEmail()
@@ -21,6 +23,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   })
   email: string;
 
+  @ApiProperty({
+    example: 'Password123#',
+    description:
+      'Password must be at least 8 characters long and no more than 18 characters long! Password must contain at least one digit and  at least one lowercase letter and at least one uppercase letter!',
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
