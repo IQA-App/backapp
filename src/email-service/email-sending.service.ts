@@ -18,7 +18,7 @@ export class EmailSendingService {
       socketTimeout: 600000,
       dnsTimeout: 60000,
       host: 'app.debugmail.io',
-      port: 25,
+      port: 9025,
       secure: false,
       pool: true, //  enable connection pooling
       maxConnections: 5, // optional – defaults to 5
