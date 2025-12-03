@@ -10,7 +10,11 @@ async function bootstrap() {
     .setTitle('Backapp API')
     .setDescription('The Backapp API description')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      description: 'Use token from POST /login or POST /user',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
