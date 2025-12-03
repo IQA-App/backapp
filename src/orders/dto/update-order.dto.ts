@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -8,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class UpdateOrderDto {
+  @ApiProperty({ example: 'The AC in my ranch home needs repair' })
   @IsOptional()
   @IsNotEmpty()
   @IsString()

@@ -13,8 +13,10 @@ import {
 
 import { PartialType } from '@nestjs/mapped-types';
 import { Role } from 'src/user/role.enum';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOrderDto {
+  @ApiProperty({ example: 'Fix air conditioner' })
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
@@ -24,6 +26,7 @@ export class CreateOrderDto {
   })
   title: string;
 
+  @ApiProperty({ example: 'The AC in my ranch home needs repair' })
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
