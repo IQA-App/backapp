@@ -5,7 +5,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-  
 
 jobs:
   build:
@@ -38,6 +37,8 @@ jobs:
                         --build-arg "SERVERPORT=${{ secrets.SERVERPORT }}" \
                         --build-arg "EMAIL_TRANSPORT_USER=${{ secrets.EMAIL_TRANSPORT_USER }}" \
                         --build-arg "EMAIL_TRANSPORT_PASSWORD=${{ secrets.EMAIL_TRANSPORT_PASSWORD }}" \
+                        --build-arg "ETHEREAL_USER=${{ secrets.ETHEREAL_USER }}" \
+                        --build-arg "ETHEREAL_PASS=${{ secrets.ETHEREAL_PASS }}" \
                         --no-cache \
                         -t iqaapp/backapp:latest \
                         .
@@ -46,10 +47,10 @@ jobs:
 
       - name: Display Docker images
         run: docker images
-        
+
   prod:
     runs-on: self-hosted
-    name: "PROD deploy"
+    name: 'PROD deploy'
     needs: build
 
     steps:
@@ -65,15 +66,14 @@ jobs:
         run: |
           DEPLOYMENT_NAME=${KUBE_DEPLOYMENT_NAME:-backapp}
           NAMESPACE=${KUBE_NAMESPACE:-default}
-          
+
           kubectl rollout restart deployment/$DEPLOYMENT_NAME --namespace=$NAMESPACE
           kubectl rollout status deployment/$DEPLOYMENT_NAME --namespace=$NAMESPACE --timeout=5m
   test:
     runs-on: ubuntu-latest
-    name: "PROD test"
+    name: 'PROD test'
     needs: [build, prod]
 
     steps:
       - name: Deploy
         run: "echo 'Testing PROD'"
-
