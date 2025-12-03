@@ -16,13 +16,24 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  //   @HttpCode(HttpStatus.OK)
   @Post('login')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+        password: { type: 'string' },
+      },
+      required: ['email', 'pasword'],
+    },
+  })
   @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
     return this.authService.login(req.user);
@@ -35,6 +46,15 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+      },
+      required: ['email'],
+    },
+  })
   async forgotPassword(
     @Body(ValidationPipe) forgotPasswordDto: ForgotPasswordDto,
   ) {
@@ -42,6 +62,18 @@ export class AuthController {
   }
 
   @Patch('reset-password')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+        confirmationCode: { type: 'string' },
+        newPassword: { type: 'string' },
+        confirmPassword: { type: 'string' },
+      },
+      required: ['email', 'confirmationCode', 'newPassword', 'confirmPassword'],
+    },
+  })
   async resetPassword(
     @Body(ValidationPipe) resetPasswordDto: ResetPasswordDto,
   ) {
@@ -49,6 +81,11 @@ export class AuthController {
   }
 
   @Get('all-codes')
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    schema: null,
+  })
   @UseGuards(JwtAuthGuard)
   async getAllCodes(
     @Req()
