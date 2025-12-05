@@ -35,4 +35,13 @@ export class CreateOrderDto {
     message: 'Only Latin letters are allowed in the order description',
   })
   description: string;
+
+  @ApiProperty({ example: 'test@test.com' })
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the email',
+  })
+  email: string;
 }

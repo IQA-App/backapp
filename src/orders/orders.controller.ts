@@ -31,8 +31,12 @@ export class OrdersController {
       example: {
         title: 'Fix air conditioner',
         description: 'The AC in my ranch home needs repair',
-        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
-        createdAt: '2025-12-03T03:22:15.356Z',
+        email: 'email@email.com',
+        orderNumber: 'ORD-202512051521-61206',
+        id: '1E0FDF66-20D2-F011-8193-7CED8DD0B18E',
+        createdAt: '2025-12-06T03:21:46.516Z',
+        status: 'pending',
+        technician: 'pending',
       },
     },
   })

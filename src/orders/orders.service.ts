@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 // import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
+import { generateOrderNumber } from './generate-order-number';
 
 @Injectable()
 export class OrdersService {
@@ -22,6 +23,7 @@ export class OrdersService {
   async createOrder(createOrderDto: CreateOrderDto) {
     const existOrder = await this.orderRepository.findOne({
       where: {
+        email: createOrderDto.email,
         title: createOrderDto.title,
       },
     });
@@ -39,6 +41,8 @@ export class OrdersService {
     const order = this.orderRepository.create({
       title: createOrderDto.title,
       description: createOrderDto.description,
+      email: createOrderDto.email,
+      orderNumber: generateOrderNumber(),
       // user: { id: userId },  // figure out in the future tickets
     });
 
