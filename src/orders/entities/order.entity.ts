@@ -40,6 +40,12 @@ export class Order {
   })
   technician: string;
 
+  @Column({ type: 'nvarchar', length: 'MAX' })
+  serviceType: string;
+
+  // @Column({ type: 'nvarchar', length: 'MAX' })
+  // address: string;
+
   @ManyToOne(() => User, (user) => user.orders, {
     eager: false,
     nullable: true,

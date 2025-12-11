@@ -2,6 +2,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
   IsStrongPassword,
@@ -44,4 +45,12 @@ export class CreateOrderDto {
     message: 'Only Latin letters are allowed in the email',
   })
   email: string;
+
+  @IsNotEmpty()
+  // @IsString()
+  serviceType: any;
+
+  // @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
+  // @IsNotEmpty()
+  // address: any;
 }

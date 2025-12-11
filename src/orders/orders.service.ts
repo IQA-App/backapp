@@ -43,10 +43,29 @@ export class OrdersService {
       description: createOrderDto.description,
       email: createOrderDto.email,
       orderNumber: generateOrderNumber(),
+      serviceType: createOrderDto
+        ? JSON.stringify(createOrderDto.serviceType)
+        : null,
+      // address: createOrderDto ? JSON.stringify(createOrderDto.address) : null,
       // user: { id: userId },  // figure out in the future tickets
     });
 
-    return await this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
+
+    return {
+      order: {
+        createdAt: savedOrder.createdAt,
+        orderNumber: savedOrder.orderNumber,
+        orderStatus: savedOrder.status,
+        orderTitle: savedOrder.title,
+        orderDescription: savedOrder.description,
+        // address: JSON.parse(savedOrder.address),
+        email: savedOrder.email,
+        technician: savedOrder.technician,
+        orderId: savedOrder.id,
+      },
+      serviceType: JSON.parse(savedOrder.serviceType),
+    };
   }
 
   async findAllOrders() {
