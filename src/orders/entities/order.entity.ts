@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { OrderStatus } from '../order-status.enum';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -20,6 +21,30 @@ export class Order {
 
   @Column()
   description: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  orderNumber: string;
+
+  @Column({
+    type: 'nvarchar',
+    default: OrderStatus.Pending,
+  })
+  status: OrderStatus;
+
+  @Column({
+    type: 'nvarchar',
+    default: OrderStatus.Pending,
+  })
+  technician: string;
+
+  @Column({ type: 'nvarchar', length: 'MAX' })
+  serviceType: string;
+
+  // @Column({ type: 'nvarchar', length: 'MAX' })
+  // address: string;
 
   @ManyToOne(() => User, (user) => user.orders, {
     eager: false,
