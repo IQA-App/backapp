@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -19,4 +20,16 @@ export class UpdateOrderDto {
     message: 'Only Latin letters are allowed in the order description',
   })
   description: string;
+
+  @ApiProperty({ example: 'test@test.com' })
+  @IsOptional()
+  @IsString()
+  @IsEmail()
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the email',
+  })
+  email: string;
+
+  @IsOptional()
+  serviceType: any;
 }

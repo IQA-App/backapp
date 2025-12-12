@@ -11,6 +11,7 @@ import { Order } from './entities/order.entity';
 // import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { generateOrderNumber } from './generate-order-number';
+import { parseMaybeJson } from 'src/utils/parse.json';
 
 @Injectable()
 export class OrdersService {
@@ -70,7 +71,24 @@ export class OrdersService {
 
   async findAllOrders() {
     const orders = await this.orderRepository.find();
-    return orders;
+    let arr = [];
+    orders.forEach(async (order) => {
+      await arr.push({
+        order: {
+          createdAt: order.createdAt,
+          orderNumber: order.orderNumber,
+          orderStatus: order.status,
+          orderTitle: order.title,
+          orderDescription: order.description,
+          email: order.email,
+          technician: order.technician,
+          orderId: order.id,
+        },
+        serviceType: JSON.parse(order.serviceType), //  bc mssql does not support objects
+      });
+    });
+
+    return arr;
   }
 
   async findOneOrderById(id: string) {
@@ -81,7 +99,20 @@ export class OrdersService {
       throw new NotFoundException('order not found');
     }
 
-    return order;
+    return {
+      order: {
+        createdAt: order.createdAt,
+        orderNumber: order.orderNumber,
+        orderStatus: order.status,
+        orderTitle: order.title,
+        orderDescription: order.description,
+        // address: JSON.parse(savedOrder.address),
+        email: order.email,
+        technician: order.technician,
+        orderId: order.id,
+      },
+      serviceType: parseMaybeJson(order.serviceType),
+    };
   }
 
   async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
@@ -95,8 +126,32 @@ export class OrdersService {
     if (updateOrderDto.description !== undefined) {
       order.description = updateOrderDto.description;
     }
+    if (updateOrderDto.serviceType !== undefined) {
+      order.serviceType =
+        typeof updateOrderDto.serviceType !== 'string'
+          ? JSON.stringify(updateOrderDto.serviceType)
+          : updateOrderDto.serviceType;
+    }
+    if (updateOrderDto.email) {
+      order.email = updateOrderDto.email;
+    }
 
-    return await this.orderRepository.save(order);
+    await this.orderRepository.save(order);
+
+    return {
+      order: {
+        createdAt: order.createdAt,
+        orderNumber: order.orderNumber,
+        orderStatus: order.status,
+        orderTitle: order.title,
+        orderDescription: order.description,
+        // address: JSON.parse(savedOrder.address),
+        email: order.email,
+        technician: order.technician,
+        orderId: order.id,
+      },
+      serviceType: updateOrderDto.serviceType,
+    };
   }
 
   async deleteOrder(id: string) {
