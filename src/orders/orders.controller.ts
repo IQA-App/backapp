@@ -12,12 +12,14 @@ import {
   BadRequestException,
   ValidationPipe,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Order } from './entities/order.entity';
 
 @Controller('orders')
 @ApiTags('orders')
@@ -69,6 +71,44 @@ export class OrdersController {
   })
   async findAll(@Req() req) {
     return await this.ordersService.findAllOrders();
+  }
+
+  @Get('by-email')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
+        title: 'test2 order',
+        createdAt: '2025-12-03T03:22:15.356Z',
+        description: 'fix toilet test1',
+      },
+    },
+  })
+  async findOrderByEmail(
+    @Query('email')
+    email: string,
+  ): Promise<Order[]> {
+    return this.ordersService.findOrdersByEmail(email);
+  }
+
+  @Get('by-ordernumber')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
+        title: 'test2 order',
+        createdAt: '2025-12-03T03:22:15.356Z',
+        description: 'fix toilet test1',
+      },
+    },
+  })
+  async findOrderByOrderNumber(
+    @Query('orderNumber')
+    orderNumber: string,
+  ): Promise<Order[]> {
+    return this.ordersService.findOrderByOrderNumber(orderNumber);
   }
 
   @Get(':id')

@@ -65,7 +65,7 @@ export class OrdersService {
         technician: savedOrder.technician,
         orderId: savedOrder.id,
       },
-      serviceType: JSON.parse(savedOrder.serviceType),
+      serviceType: parseMaybeJson(order.serviceType),
     };
   }
 
@@ -84,7 +84,7 @@ export class OrdersService {
           technician: order.technician,
           orderId: order.id,
         },
-        serviceType: JSON.parse(order.serviceType), //  bc mssql does not support objects
+        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
       });
     });
 
@@ -113,6 +113,62 @@ export class OrdersService {
       },
       serviceType: parseMaybeJson(order.serviceType),
     };
+  }
+
+  async findOrdersByEmail(email: string): Promise<Order[]> {
+    const orders = await this.orderRepository.find({
+      where: { email: email },
+    });
+    if (!orders) {
+      throw new NotFoundException('orders not found');
+    }
+
+    let arr = [];
+    orders.forEach(async (order) => {
+      await arr.push({
+        order: {
+          createdAt: order.createdAt,
+          orderNumber: order.orderNumber,
+          orderStatus: order.status,
+          orderTitle: order.title,
+          orderDescription: order.description,
+          email: order.email,
+          technician: order.technician,
+          orderId: order.id,
+        },
+        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+      });
+    });
+
+    return arr;
+  }
+
+  async findOrderByOrderNumber(orderNumber: string): Promise<Order[]> {
+    const order = await this.orderRepository.find({
+      where: { orderNumber: orderNumber },
+    });
+    if (!order) {
+      throw new NotFoundException('order not found');
+    }
+
+    let arr = [];
+    order.forEach(async (order) => {
+      await arr.push({
+        order: {
+          createdAt: order.createdAt,
+          orderNumber: order.orderNumber,
+          orderStatus: order.status,
+          orderTitle: order.title,
+          orderDescription: order.description,
+          email: order.email,
+          technician: order.technician,
+          orderId: order.id,
+        },
+        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+      });
+    });
+
+    return arr;
   }
 
   async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
@@ -150,7 +206,7 @@ export class OrdersService {
         technician: order.technician,
         orderId: order.id,
       },
-      serviceType: updateOrderDto.serviceType,
+      serviceType: parseMaybeJson(order.serviceType),
     };
   }
 

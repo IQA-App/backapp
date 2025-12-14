@@ -25,7 +25,7 @@ export class Order {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ unique: true })
   orderNumber: string;
 
   @Column({
