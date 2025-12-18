@@ -20,6 +20,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from './entities/order.entity';
+import { CreateAddressDto } from './dto/create-address.dto';
+import { BuildingType } from './building-type.enum';
 
 @Controller('orders')
 @ApiTags('orders')
@@ -44,9 +46,21 @@ export class OrdersController {
   })
   async create(
     @Req() req,
-    @Body(ValidationPipe) createOrderDto: CreateOrderDto,
+    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
+    createAddressDto: CreateAddressDto,
   ) {
-    return await this.ordersService.createOrder(createOrderDto);
+    const buildingType = req.body.address.buildingType;
+
+    if (!Object.values(BuildingType).includes(buildingType)) {
+      throw new BadRequestException(
+        `buildingType must be one of the:` + Object.values(BuildingType),
+      );
+    }
+
+    return await this.ordersService.createOrder(
+      createOrderDto,
+      createAddressDto,
+    );
   }
 
   @Get()

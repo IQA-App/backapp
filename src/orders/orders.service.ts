@@ -8,20 +8,24 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-// import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { generateOrderNumber } from './generate-order-number';
 import { parseMaybeJson } from 'src/utils/parse.json';
+import { CreateAddressDto } from './dto/create-address.dto';
+import { trimString } from 'src/utils/custom';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-    // private readonly jwtService: JwtService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
+  // private readonly jwtService: JwtService,
+  async createOrder(
+    createOrderDto: CreateOrderDto,
+    createAddressDto: CreateAddressDto,
+  ) {
     const existOrder = await this.orderRepository.findOne({
       where: {
         email: createOrderDto.email,
@@ -39,7 +43,7 @@ export class OrdersService {
     // order.description = createOrderDto.description;
     // order.user = { id: userId }; //using userEmail from request headers
 
-    const order = this.orderRepository.create({
+    const order = await this.orderRepository.create({
       title: createOrderDto.title,
       description: createOrderDto.description,
       email: createOrderDto.email,
@@ -47,7 +51,15 @@ export class OrdersService {
       serviceType: createOrderDto
         ? JSON.stringify(createOrderDto.serviceType)
         : null,
-      // address: createOrderDto ? JSON.stringify(createOrderDto.address) : null,
+      address: {
+        buildingType: createOrderDto.address.buildingType,
+        houseNumber: createOrderDto.address.houseNumber,
+        apartmentNumber: createOrderDto.address.apartmentNumber,
+        street: createOrderDto.address.street,
+        city: createOrderDto.address.city,
+        zipCode: createOrderDto.address.zipCode,
+        state: createOrderDto.address.state,
+      },
       // user: { id: userId },  // figure out in the future tickets
     });
 
@@ -60,12 +72,20 @@ export class OrdersService {
         orderStatus: savedOrder.status,
         orderTitle: savedOrder.title,
         orderDescription: savedOrder.description,
-        // address: JSON.parse(savedOrder.address),
         email: savedOrder.email,
         technician: savedOrder.technician,
         orderId: savedOrder.id,
       },
       serviceType: parseMaybeJson(order.serviceType),
+      address: {
+        buildingType: savedOrder.address.buildingType,
+        houseNumber: savedOrder.address.houseNumber,
+        apartmentNumber: savedOrder.address.apartmentNumber,
+        street: savedOrder.address.street,
+        city: savedOrder.address.city,
+        zipCode: savedOrder.address.zipCode,
+        state: savedOrder.address.state,
+      },
     };
   }
 
@@ -84,7 +104,17 @@ export class OrdersService {
           technician: order.technician,
           orderId: order.id,
         },
-        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+        serviceType: parseMaybeJson(order.serviceType),
+        //  bc mssql does not support objects
+        address: {
+          buildingType: order.address.buildingType,
+          houseNumber: order.address.houseNumber,
+          apartmentNumber: order.address.apartmentNumber,
+          street: order.address.street,
+          city: order.address.city,
+          zipCode: order.address.zipCode,
+          state: order.address.state,
+        },
       });
     });
 
@@ -112,6 +142,15 @@ export class OrdersService {
         orderId: order.id,
       },
       serviceType: parseMaybeJson(order.serviceType),
+      address: {
+        buildingType: order.address.buildingType,
+        houseNumber: order.address.houseNumber,
+        apartmentNumber: order.address.apartmentNumber,
+        street: order.address.street,
+        city: order.address.city,
+        zipCode: order.address.zipCode,
+        state: order.address.state,
+      },
     };
   }
 
@@ -137,6 +176,15 @@ export class OrdersService {
           orderId: order.id,
         },
         serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+        address: {
+          buildingType: order.address.buildingType,
+          houseNumber: order.address.houseNumber,
+          apartmentNumber: order.address.apartmentNumber,
+          street: order.address.street,
+          city: order.address.city,
+          zipCode: order.address.zipCode,
+          state: order.address.state,
+        },
       });
     });
 
@@ -164,7 +212,16 @@ export class OrdersService {
           technician: order.technician,
           orderId: order.id,
         },
-        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+        serviceType: parseMaybeJson(order.serviceType),
+        address: {
+          buildingType: order.address.buildingType,
+          houseNumber: order.address.houseNumber,
+          apartmentNumber: order.address.apartmentNumber,
+          street: order.address.street,
+          city: order.address.city,
+          zipCode: order.address.zipCode,
+          state: order.address.state,
+        }, //  bc mssql does not support objects
       });
     });
 
@@ -207,6 +264,15 @@ export class OrdersService {
         orderId: order.id,
       },
       serviceType: parseMaybeJson(order.serviceType),
+      address: {
+        buildingType: order.address.buildingType,
+        houseNumber: order.address.houseNumber,
+        apartmentNumber: order.address.apartmentNumber,
+        street: order.address.street,
+        city: order.address.city,
+        zipCode: order.address.zipCode,
+        state: order.address.state,
+      },
     };
   }
 
