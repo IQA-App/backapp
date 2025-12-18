@@ -1,20 +1,15 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsObject,
-  IsOptional,
   IsString,
-  IsStrongPassword,
   Matches,
-  maxLength,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 import { PartialType } from '@nestjs/mapped-types';
-import { Role } from 'src/user/role.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateAddressDto } from './create-address.dto';
 
 export class CreateOrderDto {
   @ApiProperty({ example: 'Fix air conditioner' })
@@ -47,10 +42,9 @@ export class CreateOrderDto {
   email: string;
 
   @IsNotEmpty()
-  // @IsString()
   serviceType: any;
 
-  // @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
-  // @IsNotEmpty()
-  // address: any;
+  @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
+  @IsNotEmpty()
+  address: CreateAddressDto;
 }

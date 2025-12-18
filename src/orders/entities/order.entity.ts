@@ -3,10 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderStatus } from '../order-status.enum';
+import { Address } from './address.entity';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -43,12 +45,16 @@ export class Order {
   @Column({ type: 'text' })
   serviceType: string;
 
-  // @Column({ type: 'nvarchar', length: 'MAX' })
-  // address: string;
-
   @ManyToOne(() => User, (user) => user.orders, {
     eager: false,
     nullable: true,
   })
   user?: User;
+
+  @ManyToOne(() => Address, (address) => address.orders, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinColumn({ name: 'address_id' })
+  address: Address;
 }
