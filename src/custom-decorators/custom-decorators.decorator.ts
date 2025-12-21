@@ -7,7 +7,6 @@ import { applyDecorators } from '@nestjs/common';
 export function Trim() {
   return Transform(({ value }) => {
     if (typeof value === 'string') {
-      console.log('--- PRINT STRING DTO ---', value);
       return value.trim();
     }
     return value;

@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 import { generateOrderNumber } from './generate-order-number';
 import { parseMaybeJson } from 'src/utils/parse.json';
 import { CreateAddressDto } from './dto/create-address.dto';
-import { trimString } from 'src/utils/custom';
 
 @Injectable()
 export class OrdersService {

@@ -46,7 +46,7 @@ export class OrdersController {
   })
   async create(
     @Req() req,
-    @Body(new ValidationPipe()) createOrderDto: CreateOrderDto,
+    @Body( ValidationPipe) createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
     const buildingType = req.body.address.buildingType;
