@@ -10,6 +10,10 @@ import {
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from './create-address.dto';
+import {
+  Trim,
+  TrimJsonString,
+} from 'src/custom-decorators/custom-decorators.decorator';
 
 export class CreateOrderDto {
   @ApiProperty({ example: 'Fix air conditioner' })
@@ -20,6 +24,7 @@ export class CreateOrderDto {
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the title',
   })
+  @Trim()
   title: string;
 
   @ApiProperty({ example: 'The AC in my ranch home needs repair' })
@@ -30,6 +35,7 @@ export class CreateOrderDto {
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the order description',
   })
+  @Trim()
   description: string;
 
   @ApiProperty({ example: 'test@test.com' })
@@ -39,9 +45,11 @@ export class CreateOrderDto {
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the email',
   })
+  @Trim()
   email: string;
 
   @IsNotEmpty()
+  @TrimJsonString()
   serviceType: any;
 
   @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
