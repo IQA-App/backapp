@@ -23,7 +23,7 @@ import { EmailServiceModule } from './email-service/email-service.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres', // for postgres
+        type: 'postgres',
         // type: 'sqlite', //  for local testing only
         host: configService.get('DB_HOST'),
         port: +configService.get('DB_PORT'),

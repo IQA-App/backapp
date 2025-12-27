@@ -15,7 +15,7 @@ export class User {
   password: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     default: Role.Customer,
   })
   role: Role;

@@ -29,18 +29,18 @@ export class Order {
   orderNumber: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     default: OrderStatus.Pending,
   })
   status: OrderStatus;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     default: OrderStatus.Pending,
   })
   technician: string;
 
-  @Column({ type: 'nvarchar', length: 'MAX' })
+  @Column({ type: 'text' })
   serviceType: string;
 
   // @Column({ type: 'nvarchar', length: 'MAX' })
