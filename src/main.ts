@@ -30,7 +30,7 @@ async function bootstrap() {
         // to make transform work
         enableImplicitConversion: true,
       },
-      // whitelist: true,
+      whitelist: true,
     }),
   );
 

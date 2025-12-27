@@ -46,7 +46,7 @@ export class OrdersController {
   })
   async create(
     @Req() req,
-    @Body( ValidationPipe) createOrderDto: CreateOrderDto,
+    @Body(ValidationPipe) createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
     const buildingType = req.body.address.buildingType;
@@ -124,6 +124,47 @@ export class OrdersController {
   ): Promise<Order[]> {
     return this.ordersService.findOrderByOrderNumber(orderNumber);
   }
+
+  //  later, requires a lot of efforts
+  // @Get('search-by-adress')
+  // @ApiResponse({
+  //   status: 201,
+  //   schema: {
+  //     example: {
+  //       title: 'Fix air conditioner',
+  //       description: 'The AC in my ranch home needs repair',
+  //       email: 'email@email.com',
+  //       orderNumber: 'ORD-202512051521-61206',
+  //       id: '1E0FDF66-20D2-F011-8193-7CED8DD0B18E',
+  //       createdAt: '2025-12-06T03:21:46.516Z',
+  //       status: 'pending',
+  //       technician: 'pending',
+  //     },
+  //   },
+  // })
+  // async findByAddress(
+  //   @Query('houseNumber') houseNumber: string,
+  //   @Query('street') street: string,
+  //   @Query('city') city: string,
+  //   @Query('zipCode') zipCode: string,
+  //   @Query('state') state: string,
+  //   @Query('apartmentNumber') apartmentNumber?: string,
+  // ) {
+  //   // if (!Object.values(BuildingType).includes(buildingType)) {
+  //   //   throw new BadRequestException(
+  //   //     `buildingType must be one of the:` + Object.values(BuildingType),
+  //   //   );
+  //   // }
+
+  //   return await this.ordersService.findOrderByAddress(
+  //     houseNumber,
+  //     apartmentNumber,
+  //     street,
+  //     city,
+  //     zipCode,
+  //     state,
+  //   );
+  // }
 
   @Get(':id')
   @ApiResponse({
