@@ -64,7 +64,7 @@ jobs:
           KUBE_DEPLOYMENT_NAME: backapp
           KUBE_NAMESPACE: default
         run: |
-          kubectl create secret generic postgres-secret --from-literal=POSTGRES_DB=${{ secrets.DB_NAME }} --from-literal=POSTGRES_USER={{ secrets.DB_USERNAME }} --from-literal=POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} --namespace=default
+          kubectl create secret generic postgres-secret --from-literal=POSTGRES_DB=${{ secrets.DB_NAME }} --from-literal=POSTGRES_USER=${{ secrets.DB_USERNAME }} --from-literal=POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} --namespace=default
           DEPLOYMENT_NAME=${KUBE_DEPLOYMENT_NAME:-backapp}
           NAMESPACE=${KUBE_NAMESPACE:-default}
 
