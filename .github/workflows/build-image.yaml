@@ -54,6 +54,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -64,9 +67,9 @@ jobs:
           KUBE_DEPLOYMENT_NAME: backapp
           KUBE_NAMESPACE: default
         run: |
-          kubectl apply -f cluster.yaml
-          kubectl delete secret postgres-secret --namespace=default
+          kubectl delete secret postgres-secret --namespace=default --ignore-not-found=true
           kubectl create secret generic postgres-secret --from-literal=POSTGRES_DB=${{ secrets.DB_NAME }} --from-literal=POSTGRES_USER=${{ secrets.DB_USERNAME }} --from-literal=POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} --namespace=default
+          kubectl apply -f cluster.yaml
           DEPLOYMENT_NAME=${KUBE_DEPLOYMENT_NAME:-backapp}
           NAMESPACE=${KUBE_NAMESPACE:-default}
 
