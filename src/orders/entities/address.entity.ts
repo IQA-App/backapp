@@ -33,5 +33,5 @@ export class Address {
   buildingType: BuildingType;
 
   @OneToMany(() => Order, (order) => order.address)
-  orders: Order;
+  orders: Order[];
 }

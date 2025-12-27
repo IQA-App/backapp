@@ -76,6 +76,9 @@ export class CreateAddressDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(50)
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the zipCode',
+  })
   @Trim()
   state: string;
 }
