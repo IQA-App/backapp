@@ -16,13 +16,10 @@ export class Order {
   id: string;
 
   @Column()
-  title: string;
+  customerName: string;
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @Column()
-  description: string;
 
   @Column()
   email: string;
@@ -40,10 +37,10 @@ export class Order {
     type: 'varchar',
     default: OrderStatus.Pending,
   })
-  technician: string;
+  assignedTo: string;
 
   @Column({ type: 'text' })
-  serviceType: string;
+  customFields: string;
 
   @ManyToOne(() => User, (user) => user.orders, {
     eager: false,

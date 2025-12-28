@@ -25,23 +25,18 @@ export class OrdersService {
     createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
-    const existOrder = await this.orderRepository.findOne({
-      where: {
-        email: createOrderDto.email,
-        title: createOrderDto.title,
-      },
-    });
-
-    if (existOrder) {
-      throw new BadRequestException('The order with this title already exists');
-    }
+    // const existOrder = await this.orderRepository.findOne({
+    //   where: {
+    //     email: createOrderDto.email,
+    //     title: createOrderDto.customerName,
+    //   },
+    // });
 
     const order = await this.orderRepository.create({
-      title: createOrderDto.title,
-      description: createOrderDto.description,
+      customerName: createOrderDto.customerName,
       email: createOrderDto.email,
       orderNumber: generateOrderNumber(),
-      serviceType: createOrderDto.serviceType,
+      customFields: createOrderDto.customFields,
       address: {
         buildingType: createOrderDto.address.buildingType,
         houseNumber: createOrderDto.address.houseNumber,
@@ -60,13 +55,12 @@ export class OrdersService {
         createdAt: savedOrder.createdAt,
         orderNumber: savedOrder.orderNumber,
         orderStatus: savedOrder.status,
-        orderTitle: savedOrder.title,
-        orderDescription: savedOrder.description,
+        customerName: savedOrder.customerName,
         email: savedOrder.email,
-        technician: savedOrder.technician,
+        assignedTo: savedOrder.assignedTo,
         orderId: savedOrder.id,
       },
-      serviceType: parseMaybeJson(order.serviceType),
+      customFields: parseMaybeJson(order.customFields),
       address: {
         buildingType: savedOrder.address.buildingType,
         houseNumber: savedOrder.address.houseNumber,
@@ -88,13 +82,12 @@ export class OrdersService {
           createdAt: order.createdAt,
           orderNumber: order.orderNumber,
           orderStatus: order.status,
-          orderTitle: order.title,
-          orderDescription: order.description,
+          customerName: order.customerName,
           email: order.email,
-          technician: order.technician,
+          assignedTo: order.assignedTo,
           orderId: order.id,
         },
-        serviceType: parseMaybeJson(order.serviceType),
+        customFields: parseMaybeJson(order.customFields),
         //  bc mssql does not support objects
         address: {
           buildingType: order.address.buildingType,
@@ -124,13 +117,12 @@ export class OrdersService {
         createdAt: order.createdAt,
         orderNumber: order.orderNumber,
         orderStatus: order.status,
-        orderTitle: order.title,
-        orderDescription: order.description,
+        customerName: order.customerName,
         email: order.email,
-        technician: order.technician,
+        assignedTo: order.assignedTo,
         orderId: order.id,
       },
-      serviceType: parseMaybeJson(order.serviceType),
+      customFields: parseMaybeJson(order.customFields),
       address: {
         buildingType: order.address.buildingType,
         houseNumber: order.address.houseNumber,
@@ -158,13 +150,12 @@ export class OrdersService {
           createdAt: order.createdAt,
           orderNumber: order.orderNumber,
           orderStatus: order.status,
-          orderTitle: order.title,
-          orderDescription: order.description,
+          customerName: order.customerName,
           email: order.email,
-          technician: order.technician,
+          assignedTo: order.assignedTo,
           orderId: order.id,
         },
-        serviceType: parseMaybeJson(order.serviceType), //  bc mssql does not support objects
+        customFields: parseMaybeJson(order.customFields), //  bc mssql does not support objects
         address: {
           buildingType: order.address.buildingType,
           houseNumber: order.address.houseNumber,
@@ -195,13 +186,12 @@ export class OrdersService {
           createdAt: order.createdAt,
           orderNumber: order.orderNumber,
           orderStatus: order.status,
-          orderTitle: order.title,
-          orderDescription: order.description,
+          customerName: order.customerName,
           email: order.email,
-          technician: order.technician,
+          assignedTo: order.assignedTo,
           orderId: order.id,
         },
-        serviceType: parseMaybeJson(order.serviceType),
+        customFields: parseMaybeJson(order.customFields),
         address: {
           buildingType: order.address.buildingType,
           houseNumber: order.address.houseNumber,
@@ -240,13 +230,13 @@ export class OrdersService {
   //         createdAt: order.createdAt,
   //         orderNumber: order.orderNumber,
   //         orderStatus: order.status,
-  //         orderTitle: order.title,
+  //         customerName: order.customerName,
   //         orderDescription: order.description,
   //         email: order.email,
-  //         technician: order.technician,
+  //         assignedTo: order.assignedTo,
   //         orderId: order.id,
   //       },
-  //       serviceType: parseMaybeJson(order.serviceType),
+  //       customFields: parseMaybeJson(order.customFields),
   //       address: {
   //         buildingType: order.address.buildingType,
   //         houseNumber: order.address.houseNumber,
@@ -270,14 +260,11 @@ export class OrdersService {
       throw new NotFoundException();
     }
 
-    if (updateOrderDto.description !== undefined) {
-      order.description = updateOrderDto.description;
-    }
-    if (updateOrderDto.serviceType !== undefined) {
-      order.serviceType =
-        typeof updateOrderDto.serviceType !== 'string'
-          ? JSON.stringify(updateOrderDto.serviceType)
-          : updateOrderDto.serviceType;
+    if (updateOrderDto.customFields !== undefined) {
+      order.customFields =
+        typeof updateOrderDto.customFields !== 'string'
+          ? JSON.stringify(updateOrderDto.customFields)
+          : updateOrderDto.customFields;
     }
     if (updateOrderDto.email) {
       order.email = updateOrderDto.email;
@@ -329,13 +316,12 @@ export class OrdersService {
         createdAt: order.createdAt,
         orderNumber: order.orderNumber,
         orderStatus: order.status,
-        orderTitle: order.title,
-        orderDescription: order.description,
+        customerName: order.customerName,
         email: order.email,
-        technician: order.technician,
+        assignedTo: order.assignedTo,
         orderId: order.id,
       },
-      serviceType: parseMaybeJson(order.serviceType),
+      customFields: parseMaybeJson(order.customFields),
       address: {
         buildingType: order.address.buildingType,
         houseNumber: order.address.houseNumber,

@@ -16,27 +16,16 @@ import {
 } from 'src/custom-decorators/custom-decorators.decorator';
 
 export class CreateOrderDto {
-  @ApiProperty({ example: 'Fix air conditioner' })
+  @ApiProperty({ example: 'Elon Musk or All Stars LLC' })
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(5)
   @MaxLength(100)
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the title',
   })
   @Trim()
-  title: string;
-
-  @ApiProperty({ example: 'The AC in my ranch home needs repair' })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(8)
-  @MaxLength(1000)
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the order description',
-  })
-  @Trim()
-  description: string;
+  customerName: string;
 
   @ApiProperty({ example: 'test@test.com' })
   @IsNotEmpty()
@@ -50,7 +39,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty()
   @TrimJsonString()
-  serviceType: any;
+  customFields: any;
 
   @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
   @IsNotEmpty()
