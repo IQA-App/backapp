@@ -28,14 +28,20 @@ export class OrdersService {
     createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
+    //  create dto without confirmEmail bc confirmEmail is just to extra validation for users
+    const { confirmEmail, ...dtoData } = createOrderDto;
+
     const order = await this.orderRepository.create({
-      customerName: createOrderDto.customerName,
-      email: createOrderDto.email,
+      customerName: dtoData.customerName,
+      email: dtoData.email, // takes email from the new dto
       orderNumber: generateOrderNumber(),
-      customFields: createOrderDto.customFields,
-      address: createOrderDto.address
-        ? Object.assign({}, createOrderDto.address)
-        : null,
+      customFields: dtoData.customFields,
+      //  use address from the dto or from createAddressDto
+      address: dtoData.address
+        ? Object.assign({}, dtoData.address)
+        : createAddressDto
+          ? Object.assign({}, createAddressDto)
+          : null,
     });
 
     const savedOrder = await this.orderRepository.save(order);
@@ -43,7 +49,7 @@ export class OrdersService {
     return OrderMapper.toResponse(savedOrder);
   }
 
-  async findAllOrders() {
+  async findAllOrders(): Promise<Order[]> {
     const orders = await this.orderRepository.find();
     let arr = [];
     orders.forEach(async (order) => {
@@ -53,7 +59,7 @@ export class OrdersService {
     return arr;
   }
 
-  async findOneOrderById(id: string) {
+  async findOneOrderById(id: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { id: id },
     });
@@ -80,7 +86,7 @@ export class OrdersService {
     return arr;
   }
 
-  async findOrderByOrderNumber(orderNumber: string): Promise<Order[]> {
+  async findOrderByOrderNumber(orderNumber: string) {
     const order = await this.orderRepository.find({
       where: { orderNumber: orderNumber },
     });
@@ -88,12 +94,7 @@ export class OrdersService {
       throw new NotFoundException('order not found');
     }
 
-    let arr = [];
-    order.forEach(async (order) => {
-      await arr.push(OrderMapper.toResponse(order));
-    });
-
-    return arr;
+    return order.map(OrderMapper.toResponse);
   }
 
   //  later
@@ -141,11 +142,21 @@ export class OrdersService {
   //   return arr;
   // }
 
-  async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
+  //  right now authorization by email
+  async updateOrder(
+    id: string,
+    authEmail: string,
+    updateOrderDto: UpdateOrderDto,
+  ) {
     const order = await this.orderRepository.findOne({
       where: { id: id },
       relations: ['address'],
     });
+
+    if (order.email !== authEmail) {
+      throw new ForbiddenException();
+    }
+
     if (!order) {
       throw new NotFoundException();
     }
@@ -159,8 +170,10 @@ export class OrdersService {
           ? JSON.stringify(updateOrderDto.customFields)
           : updateOrderDto.customFields;
     }
-    if (updateOrderDto.email) {
-      order.email = updateOrderDto.email;
+    if (updateOrderDto.email !== undefined) {
+      throw new BadRequestException(
+        'to change the email, ask customer service',
+      );
     }
 
     if (updateOrderDto.address) {

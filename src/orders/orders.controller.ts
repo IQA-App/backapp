@@ -6,10 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Req,
-  ParseIntPipe,
-  BadRequestException,
   ValidationPipe,
   ParseUUIDPipe,
   Query,
@@ -18,10 +15,9 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Order } from './entities/order.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
-import { BuildingType } from './building-type.enum';
 
 @Controller('orders')
 @ApiTags('orders')
@@ -49,14 +45,6 @@ export class OrdersController {
     @Body(ValidationPipe) createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
-    const buildingType = req.body.address.buildingType;
-
-    if (!Object.values(BuildingType).includes(buildingType)) {
-      throw new BadRequestException(
-        `buildingType must be one of the:` + Object.values(BuildingType),
-      );
-    }
-
     return await this.ordersService.createOrder(
       createOrderDto,
       createAddressDto,
@@ -121,7 +109,7 @@ export class OrdersController {
   async findOrderByOrderNumber(
     @Query('orderNumber')
     orderNumber: string,
-  ): Promise<Order[]> {
+  ): Promise<any> {
     return this.ordersService.findOrderByOrderNumber(orderNumber);
   }
 
@@ -215,7 +203,10 @@ export class OrdersController {
     @Body(ValidationPipe)
     updateOrderDto: UpdateOrderDto,
   ) {
-    return await this.ordersService.updateOrder(id, updateOrderDto);
+    //  right now authorization by email
+    const authEmail = await req.body.authEmail;
+
+    return await this.ordersService.updateOrder(id, authEmail, updateOrderDto);
   }
 
   @Delete(':id')

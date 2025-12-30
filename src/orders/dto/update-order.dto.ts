@@ -23,7 +23,7 @@ export class UpdateOrderDto {
   @MinLength(5)
   @MaxLength(100)
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the title',
+    message: 'Only Latin letters are allowed in the customerName',
   })
   @Trim()
   customerName?: string;
@@ -46,6 +46,14 @@ export class UpdateOrderDto {
       'users can not change the email, ask customer service to change the email',
   })
   email: string;
+
+  @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
+  @IsNotEmpty()
+  @IsEmail()
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the email',
+  })
+  authEmail: string;
 
   @IsOptional()
   customFields?: any;
