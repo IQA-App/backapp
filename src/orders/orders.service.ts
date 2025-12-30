@@ -12,6 +12,9 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { Order } from './entities/order.entity';
 import { generateOrderNumber } from './generate-order-number';
 import { parseMaybeJson } from 'src/utils/parse.json';
+import { UpdateAddressDto } from './dto/update-address.dto';
+import { OrderMapper } from './order.mapper';
+import { Address } from './entities/address.entity';
 
 @Injectable()
 export class OrdersService {
@@ -25,80 +28,26 @@ export class OrdersService {
     createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
-    // const existOrder = await this.orderRepository.findOne({
-    //   where: {
-    //     email: createOrderDto.email,
-    //     title: createOrderDto.customerName,
-    //   },
-    // });
-
     const order = await this.orderRepository.create({
       customerName: createOrderDto.customerName,
       email: createOrderDto.email,
       orderNumber: generateOrderNumber(),
       customFields: createOrderDto.customFields,
-      address: {
-        buildingType: createOrderDto.address.buildingType,
-        houseNumber: createOrderDto.address.houseNumber,
-        apartmentNumber: createOrderDto.address.apartmentNumber,
-        street: createOrderDto.address.street,
-        city: createOrderDto.address.city,
-        zipCode: createOrderDto.address.zipCode,
-        state: createOrderDto.address.state,
-      },
+      address: createOrderDto.address
+        ? Object.assign({}, createOrderDto.address)
+        : null,
     });
 
     const savedOrder = await this.orderRepository.save(order);
 
-    return {
-      order: {
-        createdAt: savedOrder.createdAt,
-        orderNumber: savedOrder.orderNumber,
-        orderStatus: savedOrder.status,
-        customerName: savedOrder.customerName,
-        email: savedOrder.email,
-        assignedTo: savedOrder.assignedTo,
-        orderId: savedOrder.id,
-      },
-      customFields: parseMaybeJson(order.customFields),
-      address: {
-        buildingType: savedOrder.address.buildingType,
-        houseNumber: savedOrder.address.houseNumber,
-        apartmentNumber: savedOrder.address.apartmentNumber,
-        street: savedOrder.address.street,
-        city: savedOrder.address.city,
-        zipCode: savedOrder.address.zipCode,
-        state: savedOrder.address.state,
-      },
-    };
+    return OrderMapper.toResponse(savedOrder);
   }
 
   async findAllOrders() {
     const orders = await this.orderRepository.find();
     let arr = [];
     orders.forEach(async (order) => {
-      await arr.push({
-        order: {
-          createdAt: order.createdAt,
-          orderNumber: order.orderNumber,
-          orderStatus: order.status,
-          customerName: order.customerName,
-          email: order.email,
-          assignedTo: order.assignedTo,
-          orderId: order.id,
-        },
-        customFields: parseMaybeJson(order.customFields),
-        //  bc mssql does not support objects
-        address: {
-          buildingType: order.address.buildingType,
-          houseNumber: order.address.houseNumber,
-          apartmentNumber: order.address.apartmentNumber,
-          street: order.address.street,
-          city: order.address.city,
-          zipCode: order.address.zipCode,
-          state: order.address.state,
-        },
-      });
+      await arr.push(OrderMapper.toResponse(order));
     });
 
     return arr;
@@ -112,27 +61,7 @@ export class OrdersService {
       throw new NotFoundException('order not found');
     }
 
-    return {
-      order: {
-        createdAt: order.createdAt,
-        orderNumber: order.orderNumber,
-        orderStatus: order.status,
-        customerName: order.customerName,
-        email: order.email,
-        assignedTo: order.assignedTo,
-        orderId: order.id,
-      },
-      customFields: parseMaybeJson(order.customFields),
-      address: {
-        buildingType: order.address.buildingType,
-        houseNumber: order.address.houseNumber,
-        apartmentNumber: order.address.apartmentNumber,
-        street: order.address.street,
-        city: order.address.city,
-        zipCode: order.address.zipCode,
-        state: order.address.state,
-      },
-    };
+    return OrderMapper.toResponse(order);
   }
 
   async findOrdersByEmail(email: string): Promise<Order[]> {
@@ -145,27 +74,7 @@ export class OrdersService {
 
     let arr = [];
     orders.forEach(async (order) => {
-      await arr.push({
-        order: {
-          createdAt: order.createdAt,
-          orderNumber: order.orderNumber,
-          orderStatus: order.status,
-          customerName: order.customerName,
-          email: order.email,
-          assignedTo: order.assignedTo,
-          orderId: order.id,
-        },
-        customFields: parseMaybeJson(order.customFields), //  bc mssql does not support objects
-        address: {
-          buildingType: order.address.buildingType,
-          houseNumber: order.address.houseNumber,
-          apartmentNumber: order.address.apartmentNumber,
-          street: order.address.street,
-          city: order.address.city,
-          zipCode: order.address.zipCode,
-          state: order.address.state,
-        },
-      });
+      await arr.push(OrderMapper.toResponse(order));
     });
 
     return arr;
@@ -181,27 +90,7 @@ export class OrdersService {
 
     let arr = [];
     order.forEach(async (order) => {
-      await arr.push({
-        order: {
-          createdAt: order.createdAt,
-          orderNumber: order.orderNumber,
-          orderStatus: order.status,
-          customerName: order.customerName,
-          email: order.email,
-          assignedTo: order.assignedTo,
-          orderId: order.id,
-        },
-        customFields: parseMaybeJson(order.customFields),
-        address: {
-          buildingType: order.address.buildingType,
-          houseNumber: order.address.houseNumber,
-          apartmentNumber: order.address.apartmentNumber,
-          street: order.address.street,
-          city: order.address.city,
-          zipCode: order.address.zipCode,
-          state: order.address.state,
-        }, //  bc mssql does not support objects
-      });
+      await arr.push(OrderMapper.toResponse(order));
     });
 
     return arr;
@@ -255,11 +144,15 @@ export class OrdersService {
   async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
     const order = await this.orderRepository.findOne({
       where: { id: id },
+      relations: ['address'],
     });
     if (!order) {
       throw new NotFoundException();
     }
 
+    if (updateOrderDto.customerName) {
+      order.customerName = updateOrderDto.customerName;
+    }
     if (updateOrderDto.customFields !== undefined) {
       order.customFields =
         typeof updateOrderDto.customFields !== 'string'
@@ -269,69 +162,18 @@ export class OrdersService {
     if (updateOrderDto.email) {
       order.email = updateOrderDto.email;
     }
+
     if (updateOrderDto.address) {
-      console.log('--- Trying to update address ---');
-      const addr = order.address;
-
-      console.log('--- Addr ---', addr);
-
-      if (updateOrderDto.address.houseNumber !== undefined) {
-        addr.houseNumber = updateOrderDto.address.houseNumber;
+      if (!order.address) {
+        order.address = new Address(); //  creates new instance of address if no address before
+        Object.assign(order.address, updateOrderDto.address); // inserts this address into the order
       }
-
-      if (updateOrderDto.address.street !== undefined) {
-        addr.street = updateOrderDto.address.street;
-      }
-
-      if (updateOrderDto.address.city !== undefined) {
-        addr.city = updateOrderDto.address.city;
-      }
-
-      if (updateOrderDto.address.state !== undefined) {
-        addr.state = updateOrderDto.address.state;
-      }
-
-      if (updateOrderDto.address.zipCode !== undefined) {
-        addr.zipCode = updateOrderDto.address.zipCode;
-      }
-
-      if (updateOrderDto.address.apartmentNumber !== undefined) {
-        addr.apartmentNumber = updateOrderDto.address.apartmentNumber;
-      }
+      Object.assign(order.address, updateOrderDto.address); // inserts this address into the order
     }
-
-    // if (updateOrderDto.address) {
-    //   console.log('-- updateOrderDto --', updateOrderDto);
-    //   Object.assign(order.address, updateOrderDto.address);
-    // }
-    // if (updateOrderDto.address !== undefined) {
-    //   console.log('-- updateOrderDto --', updateOrderDto);
-    //   Object.assign(order.address, updateOrderDto.address);
-    // }
 
     await this.orderRepository.save(order);
 
-    return {
-      order: {
-        createdAt: order.createdAt,
-        orderNumber: order.orderNumber,
-        orderStatus: order.status,
-        customerName: order.customerName,
-        email: order.email,
-        assignedTo: order.assignedTo,
-        orderId: order.id,
-      },
-      customFields: parseMaybeJson(order.customFields),
-      address: {
-        buildingType: order.address.buildingType,
-        houseNumber: order.address.houseNumber,
-        apartmentNumber: order.address.apartmentNumber,
-        street: order.address.street,
-        city: order.address.city,
-        zipCode: order.address.zipCode,
-        state: order.address.state,
-      },
-    };
+    return OrderMapper.toResponse(order);
   }
 
   async deleteOrder(id: string) {
