@@ -1,4 +1,11 @@
 import { Transform } from 'class-transformer';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+  ValidationArguments,
+} from 'class-validator';
 import { applyDecorators } from '@nestjs/common';
 
 /**
@@ -31,4 +38,32 @@ export function TrimJsonString() {
       return value.trim();
     }
   });
+}
+
+@ValidatorConstraint({ name: 'MatchString' }) //  register decorator
+export class MatchConstraint implements ValidatorConstraintInterface {
+  validate(value: any, args: ValidationArguments) {
+    const [relatedPropertyName] = args.constraints;
+    const relatedValue = (args.object as any)[relatedPropertyName];
+    return value === relatedValue;
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return `${args.property} does not match ${args.constraints[0]}`;
+  }
+}
+
+export function MatchString( //  compares two params in dto
+  property: string,
+  validationOptions?: ValidationOptions,
+) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [property],
+      validator: MatchConstraint,
+    });
+  };
 }
