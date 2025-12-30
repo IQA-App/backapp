@@ -1,10 +1,12 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 import { PartialType } from '@nestjs/mapped-types';
@@ -14,6 +16,7 @@ import {
   Trim,
   TrimJsonString,
 } from 'src/custom-decorators/custom-decorators.decorator';
+import { Type } from 'class-transformer';
 
 export class CreateOrderDto {
   @ApiProperty({ example: 'Elon Musk or All Stars LLC' })
@@ -42,6 +45,9 @@ export class CreateOrderDto {
   customFields: any;
 
   @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
+  @IsOptional()
   @IsNotEmpty()
-  address: CreateAddressDto;
+  @ValidateNested()
+  @Type(() => CreateAddressDto)
+  address?: CreateAddressDto;
 }

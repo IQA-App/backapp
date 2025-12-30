@@ -13,12 +13,13 @@ import { BuildingType } from '../building-type.enum';
 import { Trim } from 'src/custom-decorators/custom-decorators.decorator';
 import { Type } from 'class-transformer';
 
+//  address is optional
 export class UpdateAddressDto {
   @ApiProperty({ example: 'buildingType' })
   @IsOptional()
   @IsNotEmpty()
   @IsEnum(BuildingType, {
-    message: 'buildingType must be one of the',
+    message: 'buildingType must be one of the: ' + Object.values(BuildingType),
     each: true,
   })
   buildingType?: BuildingType;

@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { OrderStatus } from '../order-status.enum';
 import { Address } from './address.entity';
@@ -20,6 +21,9 @@ export class Order {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @Column()
   email: string;
@@ -51,7 +55,8 @@ export class Order {
   @ManyToOne(() => Address, (address) => address.orders, {
     eager: true,
     cascade: true,
+    nullable: true,
   })
   @JoinColumn({ name: 'address_id' })
-  address: Address;
+  address?: Address;
 }
