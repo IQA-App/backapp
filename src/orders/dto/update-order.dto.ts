@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDefined,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -7,6 +8,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Trim } from 'src/custom-decorators/custom-decorators.decorator';
@@ -26,15 +28,24 @@ export class UpdateOrderDto {
   @Trim()
   customerName?: string;
 
-  @ApiProperty({ example: 'test@test.com' })
-  @IsOptional()
-  @IsString()
-  @IsEmail()
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the email',
+  //  email is changebale by customer support only. we need email unchangebale by user
+  //  bc we use email as identity to update/delete orders
+  // @ApiProperty({ example: 'test@test.com' })
+  // @IsOptional()
+  // @IsString()
+  // @IsEmail()
+  // @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+  //   message: 'Only Latin letters are allowed in the email',
+  // })
+  // @Trim()
+  // email?: string;
+
+  @ValidateIf((o) => o.customerEmail !== undefined)
+  @IsDefined({
+    message:
+      'users can not change the email, ask customer service to change the email',
   })
-  @Trim()
-  email?: string;
+  email: string;
 
   @IsOptional()
   customFields?: any;
