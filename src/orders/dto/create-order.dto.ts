@@ -13,6 +13,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from './create-address.dto';
 import {
+  MatchString,
   Trim,
   TrimJsonString,
 } from 'src/custom-decorators/custom-decorators.decorator';
@@ -39,6 +40,17 @@ export class CreateOrderDto {
   })
   @Trim()
   email: string;
+
+  @ApiProperty({ example: 'test@test.com' })
+  @MatchString('email', { message: 'Email and confirmEmail doesnt match' })
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the confirmEmail',
+  })
+  @Trim()
+  confirmEmail: string;
 
   @IsNotEmpty()
   @TrimJsonString()
