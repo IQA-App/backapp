@@ -10,7 +10,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Trim } from 'src/custom-decorators/custom-decorators.decorator';
-import { CreateAddressDto } from './create-address.dto';
 import { UpdateAddressDto } from './update-address.dto';
 import { Type } from 'class-transformer';
 
@@ -25,7 +24,7 @@ export class UpdateOrderDto {
     message: 'Only Latin letters are allowed in the title',
   })
   @Trim()
-  customerName: string;
+  customerName?: string;
 
   @ApiProperty({ example: 'test@test.com' })
   @IsOptional()
@@ -35,10 +34,10 @@ export class UpdateOrderDto {
     message: 'Only Latin letters are allowed in the email',
   })
   @Trim()
-  email: string;
+  email?: string;
 
   @IsOptional()
-  customFields: any;
+  customFields?: any;
 
   @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
   @IsOptional()
