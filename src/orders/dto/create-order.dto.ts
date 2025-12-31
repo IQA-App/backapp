@@ -52,11 +52,15 @@ export class CreateOrderDto {
   @Trim()
   confirmEmail: string;
 
+  @ApiProperty({ example: 'customFields can be literally anything' })
   @IsNotEmpty()
   @TrimJsonString()
   customFields: any;
 
-  @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
+  @ApiProperty({
+    example:
+      'address is optional, eg: address: { buildingType: apartment, houseNumber:13, street:Lenin st, city:Leninsk, zipCode:RA23322, state: IL}',
+  })
   @IsOptional()
   @IsNotEmpty()
   @ValidateNested()

@@ -153,12 +153,12 @@ export class OrdersService {
       relations: ['address'],
     });
 
-    if (order.email !== authEmail) {
-      throw new ForbiddenException();
-    }
-
     if (!order) {
       throw new NotFoundException();
+    }
+
+    if (order.email !== authEmail) {
+      throw new ForbiddenException();
     }
 
     if (updateOrderDto.customerName) {

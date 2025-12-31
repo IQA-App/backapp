@@ -10,12 +10,19 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Query,
+  HttpCode,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Order } from './entities/order.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
 
@@ -25,21 +32,24 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'creates order',
+    description:
+      'creates order. only email is unique value. customFields and address are optional. if address > use CreateOrderDto as a reference',
+  })
   @ApiResponse({
     status: 201,
-    schema: {
-      example: {
-        title: 'Fix air conditioner',
-        description: 'The AC in my ranch home needs repair',
-        email: 'email@email.com',
-        orderNumber: 'ORD-202512051521-61206',
-        id: '1E0FDF66-20D2-F011-8193-7CED8DD0B18E',
-        createdAt: '2025-12-06T03:21:46.516Z',
-        status: 'pending',
-        technician: 'pending',
-      },
-    },
+    type: CreateOrderDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
+  })
+  @ApiBody({ type: CreateOrderDto })
   async create(
     @Req() req,
     @Body(ValidationPipe) createOrderDto: CreateOrderDto,
@@ -52,40 +62,36 @@ export class OrdersController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'get all orders',
+    description: 'get all orders, returns [ ] of orders',
+  })
   @ApiResponse({
     status: 200,
-    schema: {
-      example: [
-        {
-          id: '558ABFAE-38C7-F011-8195-000D3AC3A78B',
-          title: 'test order',
-          createdAt: '2025-11-22T00:17:52.236Z',
-          description: 'fix toilet test',
-        },
-        {
-          id: '2893CD00-39C7-F011-8195-000D3AC3A78B',
-          title: 'admin order',
-          createdAt: '2025-11-22T00:20:09.890Z',
-          description: 'fix toilet admin',
-        },
-      ],
-    },
+    type: [CreateOrderDto],
+    description: 'returns [ ] of orders',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
   })
   async findAll(@Req() req) {
     return await this.ordersService.findAllOrders();
   }
 
   @Get('by-email')
+  @ApiOperation({
+    summary: 'get orders by email',
+    description:
+      'get orders by email, returns [ ] of orders associated to specific email',
+  })
   @ApiResponse({
     status: 200,
-    schema: {
-      example: {
-        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
-        title: 'test2 order',
-        createdAt: '2025-12-03T03:22:15.356Z',
-        description: 'fix toilet test1',
-      },
-    },
+    type: [CreateOrderDto],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
   })
   async findOrderByEmail(
     @Query('email')
@@ -95,16 +101,17 @@ export class OrdersController {
   }
 
   @Get('by-ordernumber')
+  @ApiOperation({
+    summary: 'get order by ordernumber',
+    description: 'get order by ordernumber',
+  })
   @ApiResponse({
     status: 200,
-    schema: {
-      example: {
-        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
-        title: 'test2 order',
-        createdAt: '2025-12-03T03:22:15.356Z',
-        description: 'fix toilet test1',
-      },
-    },
+    type: CreateOrderDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
   })
   async findOrderByOrderNumber(
     @Query('orderNumber')
@@ -155,16 +162,17 @@ export class OrdersController {
   // }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'get order by orderId',
+    description: 'get order by orderId',
+  })
   @ApiResponse({
     status: 200,
-    schema: {
-      example: {
-        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
-        title: 'test2 order',
-        createdAt: '2025-12-03T03:22:15.356Z',
-        description: 'fix toilet test1',
-      },
-    },
+    type: CreateOrderDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
   })
   async findOne(
     @Req()
@@ -176,25 +184,31 @@ export class OrdersController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'update order',
+    description:
+      'update order by orderId. only authorized users can update orders',
+  })
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        description: { type: 'string' },
-      },
-      required: ['description'],
-    },
+    type: CreateOrderDto,
+    description:
+      'only email is required param to authorize action, other fields are optional',
   })
   @ApiResponse({
     status: 200,
-    schema: {
-      example: {
-        id: '04036D43-F7CF-F011-8195-000D3AC5B414',
-        title: 'test2 order',
-        createdAt: '2025-12-03T03:22:15.356Z',
-        description: 'fix toilet test1',
-      },
-    },
+    type: CreateOrderDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'if the user is not authorized to do this action',
   })
   async aupdate(
     @Param('id', ParseUUIDPipe) id: string,
@@ -210,6 +224,27 @@ export class OrdersController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'delete order',
+    description:
+      'delete order by orderId. only authorized users can delete orders',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'returns only success message',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg orderId, etc',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'if the user is not authorized to do this action',
+  })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @Req()
