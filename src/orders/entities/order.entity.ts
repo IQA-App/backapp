@@ -3,10 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { OrderStatus } from '../order-status.enum';
+import { Address } from './address.entity';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -14,18 +17,18 @@ export class Order {
   id: string;
 
   @Column()
-  title: string;
+  customerName: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column()
-  description: string;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @Column()
   email: string;
 
-  @Column()
+  @Column({ unique: true })
   orderNumber: string;
 
   @Column({
@@ -38,17 +41,22 @@ export class Order {
     type: 'varchar',
     default: OrderStatus.Pending,
   })
-  technician: string;
+  assignedTo: string;
 
   @Column({ type: 'text' })
-  serviceType: string;
-
-  // @Column({ type: 'nvarchar', length: 'MAX' })
-  // address: string;
+  customFields: string;
 
   @ManyToOne(() => User, (user) => user.orders, {
     eager: false,
     nullable: true,
   })
   user?: User;
+
+  @ManyToOne(() => Address, (address) => address.orders, {
+    eager: true,
+    cascade: true,
+    nullable: true,
+  })
+  @JoinColumn({ name: 'address_id' })
+  address?: Address;
 }

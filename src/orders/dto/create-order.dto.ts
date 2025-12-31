@@ -1,41 +1,35 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
-  IsStrongPassword,
   Matches,
-  maxLength,
   MaxLength,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 import { PartialType } from '@nestjs/mapped-types';
-import { Role } from 'src/user/role.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateAddressDto } from './create-address.dto';
+import {
+  MatchString,
+  Trim,
+  TrimJsonString,
+} from 'src/custom-decorators/custom-decorators.decorator';
+import { Type } from 'class-transformer';
 
 export class CreateOrderDto {
-  @ApiProperty({ example: 'Fix air conditioner' })
+  @ApiProperty({ example: 'Elon Musk or All Stars LLC' })
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(5)
   @MaxLength(100)
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the title',
   })
-  title: string;
-
-  @ApiProperty({ example: 'The AC in my ranch home needs repair' })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(8)
-  @MaxLength(1000)
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the order description',
-  })
-  description: string;
+  @Trim()
+  customerName: string;
 
   @ApiProperty({ example: 'test@test.com' })
   @IsNotEmpty()
@@ -44,13 +38,32 @@ export class CreateOrderDto {
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the email',
   })
+  @Trim()
   email: string;
 
+  @ApiProperty({ example: 'test@test.com' })
+  @MatchString('email', { message: 'Email and confirmEmail doesnt match' })
   @IsNotEmpty()
-  // @IsString()
-  serviceType: any;
+  @IsString()
+  @IsEmail()
+  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
+    message: 'Only Latin letters are allowed in the confirmEmail',
+  })
+  @Trim()
+  confirmEmail: string;
 
-  // @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
-  // @IsNotEmpty()
-  // address: any;
+  @ApiProperty({ example: 'customFields can be literally anything' })
+  @IsNotEmpty()
+  @TrimJsonString()
+  customFields: any;
+
+  @ApiProperty({
+    example:
+      'address is optional, eg: address: { buildingType: apartment, houseNumber:13, street:Lenin st, city:Leninsk, zipCode:RA23322, state: IL}',
+  })
+  @IsOptional()
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => CreateAddressDto)
+  address?: CreateAddressDto;
 }

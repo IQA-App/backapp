@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +20,21 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
+  //  trying to use custom decorators
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      validateCustomDecorators: true,
+      transformOptions: {
+        // to make transform work
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+    }),
+  );
+
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   await app.listen(3000);
 }

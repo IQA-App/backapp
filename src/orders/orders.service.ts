@@ -4,76 +4,62 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { InjectRepository } from '@nestjs/typeorm';
+import { CreateAddressDto } from './dto/create-address.dto';
 import { Order } from './entities/order.entity';
-// import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
 import { generateOrderNumber } from './generate-order-number';
+import { parseMaybeJson } from 'src/utils/parse.json';
+import { UpdateAddressDto } from './dto/update-address.dto';
+import { OrderMapper } from './order.mapper';
+import { Address } from './entities/address.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-    // private readonly jwtService: JwtService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
-    const existOrder = await this.orderRepository.findOne({
-      where: {
-        email: createOrderDto.email,
-        title: createOrderDto.title,
-      },
-    });
+  // private readonly jwtService: JwtService,
+  async createOrder(
+    createOrderDto: CreateOrderDto,
+    createAddressDto: CreateAddressDto,
+  ) {
+    //  create dto without confirmEmail bc confirmEmail is just to extra validation for users
+    const { confirmEmail, ...dtoData } = createOrderDto;
 
-    if (existOrder) {
-      throw new BadRequestException('The order with this title already exists');
-    }
-
-    // we may use this later
-    // const order = new Order();
-    // order.title = createOrderDto.title;
-    // order.description = createOrderDto.description;
-    // order.user = { id: userId }; //using userEmail from request headers
-
-    const order = this.orderRepository.create({
-      title: createOrderDto.title,
-      description: createOrderDto.description,
-      email: createOrderDto.email,
+    const order = await this.orderRepository.create({
+      customerName: dtoData.customerName,
+      email: dtoData.email, // takes email from the new dto
       orderNumber: generateOrderNumber(),
-      serviceType: createOrderDto
-        ? JSON.stringify(createOrderDto.serviceType)
-        : null,
-      // address: createOrderDto ? JSON.stringify(createOrderDto.address) : null,
-      // user: { id: userId },  // figure out in the future tickets
+      customFields: dtoData.customFields,
+      //  use address from the dto or from createAddressDto
+      address: dtoData.address
+        ? Object.assign({}, dtoData.address)
+        : createAddressDto
+          ? Object.assign({}, createAddressDto)
+          : null,
     });
 
     const savedOrder = await this.orderRepository.save(order);
 
-    return {
-      order: {
-        createdAt: savedOrder.createdAt,
-        orderNumber: savedOrder.orderNumber,
-        orderStatus: savedOrder.status,
-        orderTitle: savedOrder.title,
-        orderDescription: savedOrder.description,
-        // address: JSON.parse(savedOrder.address),
-        email: savedOrder.email,
-        technician: savedOrder.technician,
-        orderId: savedOrder.id,
-      },
-      serviceType: JSON.parse(savedOrder.serviceType),
-    };
+    return OrderMapper.toResponse(savedOrder);
   }
 
-  async findAllOrders() {
+  async findAllOrders(): Promise<Order[]> {
     const orders = await this.orderRepository.find();
-    return orders;
+    let arr = [];
+    orders.forEach(async (order) => {
+      await arr.push(OrderMapper.toResponse(order));
+    });
+
+    return arr;
   }
 
-  async findOneOrderById(id: string) {
+  async findOneOrderById(id: string): Promise<any> {
     const order = await this.orderRepository.findOne({
       where: { id: id },
     });
@@ -81,22 +67,126 @@ export class OrdersService {
       throw new NotFoundException('order not found');
     }
 
-    return order;
+    return OrderMapper.toResponse(order);
   }
 
-  async updateOrder(id: string, updateOrderDto: UpdateOrderDto) {
+  async findOrdersByEmail(email: string): Promise<Order[]> {
+    const orders = await this.orderRepository.find({
+      where: { email: email },
+    });
+    if (!orders) {
+      throw new NotFoundException('orders not found');
+    }
+
+    let arr = [];
+    orders.forEach(async (order) => {
+      await arr.push(OrderMapper.toResponse(order));
+    });
+
+    return arr;
+  }
+
+  async findOrderByOrderNumber(orderNumber: string) {
+    const order = await this.orderRepository.find({
+      where: { orderNumber: orderNumber },
+    });
+    if (!order) {
+      throw new NotFoundException('order not found');
+    }
+
+    return order.map(OrderMapper.toResponse);
+  }
+
+  //  later
+  // async findOrderByAddress(
+  //   houseNumber: string,
+  //   apartmentNumber: string,
+  //   street: string,
+  //   city: string,
+  //   zipCode: string,
+  //   state: string,
+  // ): Promise<Order[]> {
+  //   const order = await this.orderRepository.find({
+  //     where: { address: searchAddress },
+  //   });
+  //   if (!order) {
+  //     throw new NotFoundException('order not found');
+  //   }
+
+  //   let arr = [];
+  //   order.forEach(async (order) => {
+  //     await arr.push({
+  //       order: {
+  //         createdAt: order.createdAt,
+  //         orderNumber: order.orderNumber,
+  //         orderStatus: order.status,
+  //         customerName: order.customerName,
+  //         orderDescription: order.description,
+  //         email: order.email,
+  //         assignedTo: order.assignedTo,
+  //         orderId: order.id,
+  //       },
+  //       customFields: parseMaybeJson(order.customFields),
+  //       address: {
+  //         buildingType: order.address.buildingType,
+  //         houseNumber: order.address.houseNumber,
+  //         apartmentNumber: order.address.apartmentNumber,
+  //         street: order.address.street,
+  //         city: order.address.city,
+  //         zipCode: order.address.zipCode,
+  //         state: order.address.state,
+  //       }, //  bc mssql does not support objects
+  //     });
+  //   });
+
+  //   return arr;
+  // }
+
+  //  right now authorization by email
+  async updateOrder(
+    id: string,
+    authEmail: string,
+    updateOrderDto: UpdateOrderDto,
+  ) {
     const order = await this.orderRepository.findOne({
       where: { id: id },
+      relations: ['address'],
     });
+
     if (!order) {
       throw new NotFoundException();
     }
 
-    if (updateOrderDto.description !== undefined) {
-      order.description = updateOrderDto.description;
+    if (order.email !== authEmail) {
+      throw new ForbiddenException();
     }
 
-    return await this.orderRepository.save(order);
+    if (updateOrderDto.customerName) {
+      order.customerName = updateOrderDto.customerName;
+    }
+    if (updateOrderDto.customFields !== undefined) {
+      order.customFields =
+        typeof updateOrderDto.customFields !== 'string'
+          ? JSON.stringify(updateOrderDto.customFields)
+          : updateOrderDto.customFields;
+    }
+    if (updateOrderDto.email !== undefined) {
+      throw new BadRequestException(
+        'to change the email, ask customer service',
+      );
+    }
+
+    if (updateOrderDto.address) {
+      if (!order.address) {
+        order.address = new Address(); //  creates new instance of address if no address before
+        Object.assign(order.address, updateOrderDto.address); // inserts this address into the order
+      }
+      Object.assign(order.address, updateOrderDto.address); // inserts this address into the order
+    }
+
+    await this.orderRepository.save(order);
+
+    return OrderMapper.toResponse(order);
   }
 
   async deleteOrder(id: string) {
