@@ -15,7 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'test@test.com' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @IsEmail()
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
@@ -28,7 +28,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description:
       'Password must be at least 8 characters long and no more than 18 characters long! Password must contain at least one digit and  at least one lowercase letter and at least one uppercase letter!',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(8)
   @MaxLength(18)
