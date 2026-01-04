@@ -67,7 +67,7 @@ export class EmailSendingService {
       const previewUrl = nodemailer.getTestMessageUrl(info);
 
       // return { 'Link with your code: ': previewUrl, messageId: info.messageId };
-      return { message: 'we sent confirmation to your email' };
+      return { message: 'we sent confirmation code to your email' };
     } catch (err: any) {
       console.error('EMAIL SENDING error:', err);
       throw err;
