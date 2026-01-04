@@ -2,14 +2,10 @@ import {
   Controller,
   Post,
   Get,
-  Put,
   Delete,
-  HttpCode,
   Param,
-  ParseIntPipe,
   ValidationPipe,
   Body,
-  NotFoundException,
   Patch,
   Req,
   BadRequestException,
@@ -21,7 +17,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('user')
 @Controller('user')
@@ -29,8 +31,23 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'get all users',
+    description: 'get all users. requires admin role to having this access',
+  })
+  @ApiResponse({
+    status: 200,
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'if the user requested this resourse, doesnt have admin role',
+  })
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
   async findAllUsers(
     @Req()
@@ -43,6 +60,24 @@ export class UserController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'get specific user by user_id',
+    description:
+      'get specific user by user_id. only owner of this account can have this access',
+  })
+  @ApiResponse({
+    status: 200,
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'if the user requested this resourse, doesnt have admin role or its not an owner',
+  })
   @ApiBearerAuth()
   @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
@@ -58,11 +93,59 @@ export class UserController {
   }
 
   @Post()
-  async createUser(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+  @ApiOperation({
+    summary: 'creates user',
+    description: 'creates user. requires email and password in the body',
+  })
+  @ApiResponse({
+    status: 201,
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  async createUser(
+    @Req() req,
+    @Body()
+    any,
+  ) {
+    const body = await req.body;
+    const requestBodyKeys = await Object.keys(req.body);
+
+    if (!body || body === undefined || Object.keys(body).length === 0) {
+      throw new BadRequestException('body can not be empty');
+    }
+    if (
+      requestBodyKeys &&
+      JSON.stringify(requestBodyKeys) !== JSON.stringify(['email', 'password'])
+    ) {
+      throw new BadRequestException('use only allowed body parameters');
+    }
+    const createUserDto = body as CreateUserDto;
+
     return await this.userService.createUser(createUserDto);
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'update specific user by user_id',
+    description:
+      'update specific user by user_id. only owner of this account can have this access',
+  })
+  @ApiResponse({
+    status: 200,
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'if the user requested this resourse, doesnt have admin role or its not an owner',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateUser(
@@ -73,28 +156,44 @@ export class UserController {
   ) {
     const userId = await req.user.id;
     const body = await req.body;
+    const requestBodyKeys = await Object.keys(req.body);
 
-    if (!body) {
+    if (!body || body === undefined || Object.keys(body).length === 0) {
       throw new BadRequestException('body can not be empty');
     }
-    if (!body.email || !body.email.length) {
-      throw new BadRequestException('email can not be empty');
-    }
-    if (!body.password || !body.password.length) {
-      throw new BadRequestException('password can not be empty');
+    if (
+      requestBodyKeys &&
+      JSON.stringify(requestBodyKeys) !== JSON.stringify(['email', 'password'])
+    ) {
+      throw new BadRequestException('use only allowed body parameters');
     }
 
     return this.userService.updateUser(lookUpId, userId, updateUserDto);
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'deletes specific user by user_id',
+    description:
+      'deletes specific user by user_id. only owner of this account can have this access',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'returns nothing',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'if the user requested this resourse, doesnt have rights to this user',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async deleteUser(
-    @Param('id', ParseUUIDPipe) lookUpId: string,
-    @Req() req,
-  ) {
-    const userId = await req.user.id.toString(); //  we have to change this covertion to string in future tickets with uuid
+  async deleteUser(@Param('id', ParseUUIDPipe) lookUpId: string, @Req() req) {
+    const userId = await req.user.id;
 
     return await this.userService.deleteUser(lookUpId, userId);
   }
