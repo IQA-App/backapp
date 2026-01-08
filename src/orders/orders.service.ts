@@ -15,12 +15,16 @@ import { parseMaybeJson } from 'src/utils/parse.json';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { OrderMapper } from './order.mapper';
 import { Address } from './entities/address.entity';
+import { TelegramService } from 'src/telegram/telegram.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    private readonly telegramService: TelegramService,
   ) {}
 
   // private readonly jwtService: JwtService,
@@ -45,6 +49,12 @@ export class OrdersService {
     });
 
     const savedOrder = await this.orderRepository.save(order);
+
+    const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
+    await this.telegramService.sendMessage(
+      adminChatId,
+      `📦 New order #${order.orderNumber}`,
+    );
 
     return OrderMapper.toResponse(savedOrder);
   }
