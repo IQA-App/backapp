@@ -14,20 +14,21 @@ export class TelegramService {
     this.bot.on('message', this.onReceiveMessage);
   }
 
-  onModuleInit() {
-    this.bot.startPolling();
+  //    disabled for now
+  //   onModuleInit() {
+  //     this.bot.startPolling();
 
-    // Listen chanels messages
-    this.bot.on('channel_post', (msg) => {
-      this.logger.log('--- Message from the chanel ---');
-      this.logger.log(`Channel ID: ${msg.chat.id}`);
-      this.logger.log(`Message text: ${msg.text}`);
-    });
+  //     // Listen chanels messages
+  //     this.bot.on('channel_post', (msg) => {
+  //       this.logger.log('--- Message from the chanel ---');
+  //       this.logger.log(`Channel ID: ${msg.chat.id}`);
+  //       this.logger.log(`Message text: ${msg.text}`);
+  //     });
 
-    this.bot.on('message', (msg) => {
-      this.logger.log(`chat ID : ${msg.chat.id}`);
-    });
-  }
+  //     this.bot.on('message', (msg) => {
+  //       this.logger.log(`chat ID : ${msg.chat.id}`);
+  //     });
+  //   }
 
   onReceiveMessage = (msg: any) => {
     this.bot.on('channel_post', (msg) => {

@@ -196,6 +196,12 @@ export class OrdersService {
 
     await this.orderRepository.save(order);
 
+    const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
+    await this.telegramService.sendMessage(
+      adminChatId,
+      `📦 The order #${order.orderNumber} has been changed`,
+    );
+
     return OrderMapper.toResponse(order);
   }
 
