@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { EmailServiceModule } from './email-service/email-service.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EmailServiceModule } from './email-service/email-service.module';
     AuthModule,
     OrdersModule,
     EmailServiceModule,
+    TelegramModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
