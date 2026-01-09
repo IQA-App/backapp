@@ -29,6 +29,8 @@ import {
 import { Order } from './entities/order.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateOrderStatusDto } from './dto/update-orderStatus.dto';
+import { UpdateOrderAssigneeDto } from './dto/update-orderAssignee.dto';
+import { ApiCommonErrorResponses } from 'src/custom-decorators/custom-decorators.decorator';
 
 @Controller('orders')
 @ApiTags('orders')
@@ -202,19 +204,8 @@ export class OrdersController {
     status: 200,
     type: CreateOrderDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'if the order not found',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'if the user is not authorized to do this action',
-  })
-  async aupdate(
+  @ApiCommonErrorResponses()
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Req()
     req,
@@ -235,31 +226,20 @@ export class OrdersController {
   })
   @ApiBody({
     type: UpdateOrderStatusDto,
-    description: 'requires orderNumber and orderStatus(is optional)',
+    description: 'requires orderNumber and orderStatus',
   })
   @ApiResponse({
     status: 200,
     type: Order,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'if the order not found',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'if the user is not authorized to do this action',
-  })
+  @ApiCommonErrorResponses()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateOrderStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Req()
     req,
-    @Body() any,
+    @Body(ValidationPipe) updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
     const userRole = await req.user.role;
     const orderNumber = await req.body.orderNumber;
@@ -281,12 +261,60 @@ export class OrdersController {
       throw new ForbiddenException();
     }
 
-    const updateOrderStatusDto = body as UpdateOrderStatusDto;
-
     return await this.ordersService.updateOrderStatus(
       id,
       orderNumber,
       updateOrderStatusDto,
+    );
+  }
+
+  @Patch(':id/assign')
+  @ApiOperation({
+    summary: 'update order assignee',
+    description:
+      'update order assignee only by orderId. only admin can update orders',
+  })
+  @ApiBody({
+    type: UpdateOrderAssigneeDto,
+    description: 'requires orderNumber and assignedTo',
+  })
+  @ApiResponse({
+    status: 200,
+    type: Order,
+  })
+  @ApiCommonErrorResponses()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateOrderAssignee(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req()
+    req,
+    @Body(ValidationPipe) updateOrderAssigneeDto: UpdateOrderAssigneeDto,
+  ) {
+    const userRole = await req.user.role;
+    const orderNumber = await req.body.orderNumber;
+    const body = await req.body;
+    const requestBodyKeys = await Object.keys(req.body);
+
+    if (!body || body === undefined || Object.keys(body).length === 0) {
+      throw new BadRequestException('body can not be empty');
+    }
+    if (
+      requestBodyKeys &&
+      JSON.stringify(requestBodyKeys) !==
+        JSON.stringify(['orderNumber', 'assignedTo'])
+    ) {
+      throw new BadRequestException('use only allowed body parameters');
+    }
+
+    if (userRole !== 'admin') {
+      throw new ForbiddenException();
+    }
+
+    return await this.ordersService.updateOrderAssignee(
+      id,
+      orderNumber,
+      updateOrderAssigneeDto,
     );
   }
 
@@ -300,18 +328,7 @@ export class OrdersController {
     status: 200,
     description: 'returns only success message',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg orderId, etc',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'if the order not found',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'if the user is not authorized to do this action',
-  })
+  @ApiCommonErrorResponses()
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
     @Req()

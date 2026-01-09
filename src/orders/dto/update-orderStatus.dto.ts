@@ -5,7 +5,6 @@ import { OrderStatus } from '../order-status.enum';
 
 export class UpdateOrderStatusDto {
   @ApiProperty({ example: 'ORD-20260108-00GP' })
-  @IsOptional()
   @IsNotEmpty()
   @Trim()
   orderNumber: string;
@@ -17,5 +16,6 @@ export class UpdateOrderStatusDto {
     message: 'orderStatus must be one of the: ' + Object.values(OrderStatus),
     each: true,
   })
+  @Trim()
   orderStatus?: OrderStatus;
 }
