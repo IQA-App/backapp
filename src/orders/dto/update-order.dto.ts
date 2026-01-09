@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDefined,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -14,6 +15,7 @@ import {
 import { Trim } from 'src/custom-decorators/custom-decorators.decorator';
 import { UpdateAddressDto } from './update-address.dto';
 import { Type } from 'class-transformer';
+import { OrderStatus } from '../order-status.enum';
 
 export class UpdateOrderDto {
   @ApiProperty({ example: 'Elon Musk or All Stars LLC' })
@@ -46,6 +48,15 @@ export class UpdateOrderDto {
       'users can not change the email, ask customer service to change the email',
   })
   email: string;
+
+  // @ApiProperty({ example: 'pending, in-progress, completed' })
+  // @IsOptional()
+  // @IsNotEmpty()
+  // @IsEnum(OrderStatus, {
+  //   message: 'orderStatus must be one of the: ' + Object.values(OrderStatus),
+  //   each: true,
+  // })
+  // orderStatus?: OrderStatus;
 
   @ApiProperty({ example: '13 Lenin st, Leninsk, RA23322' })
   @IsNotEmpty()

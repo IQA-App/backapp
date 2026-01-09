@@ -8,7 +8,7 @@ export class OrderMapper {
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
         orderNumber: order.orderNumber,
-        orderStatus: order.status,
+        orderStatus: order.orderStatus,
         customerName: order.customerName,
         email: order.email,
         assignedTo: order.assignedTo,

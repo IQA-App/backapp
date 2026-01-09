@@ -35,7 +35,7 @@ export class Order {
     type: 'varchar',
     default: OrderStatus.Pending,
   })
-  status: OrderStatus;
+  orderStatus: OrderStatus;
 
   @Column({
     type: 'varchar',
