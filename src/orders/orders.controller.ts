@@ -11,6 +11,9 @@ import {
   ParseUUIDPipe,
   Query,
   HttpCode,
+  UseGuards,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -25,6 +28,7 @@ import {
 } from '@nestjs/swagger';
 import { Order } from './entities/order.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateOrderStatusDto } from './dto/update-orderStatus.dto';
 
 @Controller('orders')
 @ApiTags('orders')
@@ -221,6 +225,69 @@ export class OrdersController {
     const authEmail = await req.body.authEmail;
 
     return await this.ordersService.updateOrder(id, authEmail, updateOrderDto);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({
+    summary: 'update order status',
+    description:
+      'update order status only by orderId. only admin can update orders',
+  })
+  @ApiBody({
+    type: UpdateOrderStatusDto,
+    description: 'requires orderNumber and orderStatus(is optional)',
+  })
+  @ApiResponse({
+    status: 200,
+    type: Order,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'if something wrong, eg body, etc',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the order not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'if the user is not authorized to do this action',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateOrderStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req()
+    req,
+    @Body() any,
+  ) {
+    const userRole = await req.user.role;
+    const orderNumber = await req.body.orderNumber;
+    const body = await req.body;
+    const requestBodyKeys = await Object.keys(req.body);
+
+    if (!body || body === undefined || Object.keys(body).length === 0) {
+      throw new BadRequestException('body can not be empty');
+    }
+    if (
+      requestBodyKeys &&
+      JSON.stringify(requestBodyKeys) !==
+        JSON.stringify(['orderNumber', 'orderStatus'])
+    ) {
+      throw new BadRequestException('use only allowed body parameters');
+    }
+
+    if (userRole !== 'admin') {
+      throw new ForbiddenException();
+    }
+
+    const updateOrderStatusDto = body as UpdateOrderStatusDto;
+
+    return await this.ordersService.updateOrderStatus(
+      id,
+      orderNumber,
+      updateOrderStatusDto,
+    );
   }
 
   @Delete(':id')

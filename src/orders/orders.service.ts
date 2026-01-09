@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-orderStatus.dto';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { Order } from './entities/order.entity';
 import { generateOrderNumber } from './generate-order-number';
@@ -32,6 +33,7 @@ export class OrdersService {
     createOrderDto: CreateOrderDto,
     createAddressDto: CreateAddressDto,
   ) {
+    const project2Url = this.configService.get('PROJECT2_URL');
     //  create dto without confirmEmail bc confirmEmail is just to extra validation for users
     const { confirmEmail, ...dtoData } = createOrderDto;
 
@@ -53,7 +55,7 @@ export class OrdersService {
     const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
     await this.telegramService.sendMessage(
       adminChatId,
-      `📦 New order #${order.orderNumber}`,
+      `📦 New order #${order.orderNumber}. check order here: ${project2Url}`,
     );
 
     return OrderMapper.toResponse(savedOrder);
@@ -158,6 +160,7 @@ export class OrdersService {
     authEmail: string,
     updateOrderDto: UpdateOrderDto,
   ) {
+    const project2Url = this.configService.get('PROJECT2_URL');
     const order = await this.orderRepository.findOne({
       where: { id: id },
       relations: ['address'],
@@ -199,7 +202,43 @@ export class OrdersService {
     const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
     await this.telegramService.sendMessage(
       adminChatId,
-      `📦 The order #${order.orderNumber} has been changed`,
+      `📦 The order #${order.orderNumber} has been changed. check order here: ${project2Url}`,
+    );
+
+    return OrderMapper.toResponse(order);
+  }
+
+  async updateOrderStatus(
+    id: string,
+    orderNumber: string,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+  ) {
+    const project2Url = this.configService.get('PROJECT2_URL');
+
+    const order = await this.orderRepository.findOne({
+      where: { id: id, orderNumber: orderNumber },
+      relations: ['address'],
+    });
+
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    if (!updateOrderStatusDto.orderStatus) {
+      throw new BadRequestException('missing orderStatus');
+    }
+
+    if (updateOrderStatusDto.orderStatus !== undefined) {
+      order.orderStatus = updateOrderStatusDto.orderStatus;
+    }
+
+    await this.orderRepository.save(order);
+
+    const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
+    await this.telegramService.sendMessage(
+      adminChatId,
+      `📦 The order #${order.orderNumber} status is: ${updateOrderStatusDto.orderStatus} \n 
+      check order here: ${project2Url}`,
     );
 
     return OrderMapper.toResponse(order);
