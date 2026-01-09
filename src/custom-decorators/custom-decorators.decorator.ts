@@ -67,3 +67,26 @@ export function MatchString( //  compares two params in dto
     });
   };
 }
+
+import {
+  ApiResponse,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
+
+export function ApiCommonErrorResponses() {
+  return applyDecorators(
+    ApiResponse({
+      status: 400,
+      description: 'if something wrong, eg body, etc',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'if the order not found',
+    }),
+    ApiResponse({
+      status: 403,
+      description: 'if the user is not authorized to do this action',
+    }),
+  );
+}
