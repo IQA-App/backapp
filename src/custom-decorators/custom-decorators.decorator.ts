@@ -82,7 +82,7 @@ export function ApiCommonErrorResponses() {
     }),
     ApiResponse({
       status: 404,
-      description: 'if the order not found',
+      description: 'if the resource not found',
     }),
     ApiResponse({
       status: 403,
