@@ -9,17 +9,21 @@ import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { EmailServiceModule } from './email-service/email-service.module';
 import { TelegramModule } from './telegram/telegram.module';
+import { PartnersController } from './partners/partners.controller';
+import { PartnerService } from './partners/partners.service';
+import { PartnersModule } from './partners/partners.module';
 
 @Module({
   imports: [
     HealthModule,
-    // UserModule,
-    // AuthModule,
-    // OrdersModule,
-    // AuthModule,
-    // OrdersModule,
-    // EmailServiceModule,
-    // TelegramModule,
+    UserModule,
+    AuthModule,
+    OrdersModule,
+    AuthModule,
+    OrdersModule,
+    EmailServiceModule,
+    TelegramModule,
+    PartnersModule,
     ConfigModule.forRoot({ isGlobal: true }),
     // TypeOrmModule.forRootAsync({
     //   imports: [ConfigModule],
