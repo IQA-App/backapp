@@ -65,7 +65,6 @@ export class UserController {
   })
   @ApiCommonErrorResponses()
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
   async findOneById(
     @Param('id', ParseUUIDPipe) lookUpId: string,
