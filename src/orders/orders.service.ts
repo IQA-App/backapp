@@ -241,7 +241,7 @@ export class OrdersService {
     await this.telegramService.sendMessage(
       adminChatId,
       `📦 The order #${order.orderNumber} status is: ${updateOrderStatusDto.orderStatus} 
-      check order here: ${project2Url}`,
+      check order here: ${project2Url}/orders`,
     );
 
     return OrderMapper.toResponse(order);
