@@ -41,13 +41,13 @@ export class UpdatePartnerDto {
   @Trim()
   email?: string;
 
-  @ApiProperty({ example: 'active' })
-  @IsOptional()
-  @IsNotEmpty()
-  @IsEnum(PartnerStatus)
-  @IsString()
-  @Trim()
-  patnerStatus?: string;
+  // @ApiProperty({ example: 'active' })
+  // @IsOptional()
+  // @IsNotEmpty()
+  // @IsEnum(PartnerStatus)
+  // @IsString()
+  // @Trim()
+  // patnerStatus?: string;
 
   @ApiProperty({ example: 'active' })
   @IsOptional()

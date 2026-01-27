@@ -14,12 +14,13 @@ import { CreatePartnerDto } from './dto/create-partner.dto';
 import { generateRandomSixDigitString } from './generate-auth-secret';
 import { PartnersMapper } from './partner.mapper';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { UpdatePartnerStatusDto } from './dto/update-partnerStatus.dto';
 
 /*
-partners mean who is going to use this app and then have customers
-who will make orders.
-partners will have access to telegram bot and receive notifications
-for now only admin can CRUD partners
+- partners mean who is going to use this app and then have customers
+  who will make orders.
+- partners will have access to telegram bot and receive notifications
+  for now only admin can CRUD partners
 */
 
 @Injectable()
@@ -138,12 +139,11 @@ export class PartnerService {
     }
 
     try {
-      return await this.partnerRepository.save(partner);
+      await this.partnerRepository.save(partner);
+      return PartnersMapper.toResponse(partner);
     } catch (error) {
       throw new Error(error);
     }
-
-    return PartnersMapper.toResponse(partner);
   }
 
   async deletePartner(id: string) {
@@ -164,5 +164,28 @@ export class PartnerService {
 
   async updateAuthSecret() {} //   this should generate/update telegram auth secret
 
-  //    need to create methods: update partner status, 
+  async updatePartnerStatus(
+    id: string,
+    updatePartnerStatusDto: UpdatePartnerStatusDto,
+  ) {
+    const partner = await this.partnerRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!partner) {
+      throw new NotFoundException('partner not found');
+    }
+
+    if (updatePartnerStatusDto.patnerStatus) {
+      partner.partnerStatus = updatePartnerStatusDto.patnerStatus;
+    }
+
+    try {
+      await this.partnerRepository.save(partner);
+      return PartnersMapper.toResponse(partner);
+    } catch (error) {
+      console.log('ERROR on update partner status', error);
+      throw error;
+    }
+  }
 }
