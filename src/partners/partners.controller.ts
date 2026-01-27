@@ -24,13 +24,18 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiCommonErrorResponses } from 'src/custom-decorators/custom-decorators.decorator';
+import {
+  AdminGuard,
+  ApiCommonErrorResponses,
+} from 'src/custom-decorators/custom-decorators.decorator';
 import { PartnerService } from './partners.service';
 import { CreatePartnerDto } from './dto/create-partner.dto';
 import { Partners } from './entities/partners.entity';
 import { UpdatePartnerDto } from './dto/update-partner.dto';
+import { UpdatePartnerStatusDto } from './dto/update-partnerStatus.dto';
 
 @Controller('partners')
+@UseGuards(JwtAuthGuard, AdminGuard)
 @ApiTags('partners')
 export class PartnersController {
   constructor(private readonly partnersService: PartnerService) {}
@@ -121,9 +126,35 @@ export class PartnersController {
     @Req()
     req,
     @Body(ValidationPipe)
-    UpdatePartnerDto: UpdatePartnerDto,
+    updatePartnerDto: UpdatePartnerDto,
   ): Promise<any> {
-    return await this.partnersService.updatePartnerById(id, UpdatePartnerDto);
+    return await this.partnersService.updatePartnerById(id, updatePartnerDto);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({
+    summary: 'update partner by partnerId',
+    description: 'update partner by partnerId',
+  })
+  @ApiResponse({
+    status: 200,
+    type: UpdatePartnerDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'if the partner not found',
+  })
+  async updatePartnerStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req()
+    req,
+    @Body(ValidationPipe)
+    updatePartnerStatusDto: UpdatePartnerStatusDto,
+  ): Promise<any> {
+    return await this.partnersService.updatePartnerStatus(
+      id,
+      updatePartnerStatusDto,
+    );
   }
 
   @Delete(':id')
