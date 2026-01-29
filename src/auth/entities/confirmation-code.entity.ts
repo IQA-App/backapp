@@ -27,7 +27,7 @@ export class Codes {
   email: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     default: CodeStatus.Pending,
   })
   status: CodeStatus;
