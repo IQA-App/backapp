@@ -27,7 +27,7 @@ export class Address {
   state?: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'varchar',
     length: 50,
     enum: BuildingType,
     nullable: true,
