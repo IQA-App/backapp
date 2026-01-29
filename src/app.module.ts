@@ -37,7 +37,7 @@ import { PartnersModule } from './partners/partners.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.js, .ts}'],
-        synchronize: true, //  do not use true for the prod
+        synchronize: false, //  do not use true for the prod
       }),
     }),
   ],
