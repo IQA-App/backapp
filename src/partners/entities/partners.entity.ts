@@ -44,7 +44,7 @@ export class Partners {
   @Column({ type: 'varchar', default: AuthSecretStatus.Pending })
   authSecretStatus: AuthSecretStatus;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   authSecretExpiresAt: Date | null;
 
   @Column({ type: 'text' })
