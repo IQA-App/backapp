@@ -18,6 +18,7 @@ import { OrderMapper } from './order.mapper';
 import { Address } from './entities/address.entity';
 import { TelegramService } from 'src/telegram/telegram.service';
 import { ConfigService } from '@nestjs/config';
+import { UpdateOrderAssigneeDto } from './dto/update-orderAssignee.dto';
 
 @Injectable()
 export class OrdersService {
@@ -55,7 +56,8 @@ export class OrdersService {
     const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
     await this.telegramService.sendMessage(
       adminChatId,
-      `📦 New order #${order.orderNumber}. check order here: ${project2Url}`,
+      `📦 New order #${order.orderNumber}. 
+      check order here: ${project2Url}`,
     );
 
     return OrderMapper.toResponse(savedOrder);
@@ -202,7 +204,8 @@ export class OrdersService {
     const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
     await this.telegramService.sendMessage(
       adminChatId,
-      `📦 The order #${order.orderNumber} has been changed. check order here: ${project2Url}`,
+      `📦 The order #${order.orderNumber} has been changed. 
+      check order here: ${project2Url}`,
     );
 
     return OrderMapper.toResponse(order);
@@ -237,7 +240,39 @@ export class OrdersService {
     const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
     await this.telegramService.sendMessage(
       adminChatId,
-      `📦 The order #${order.orderNumber} status is: ${updateOrderStatusDto.orderStatus} \n 
+      `📦 The order #${order.orderNumber} status is: ${updateOrderStatusDto.orderStatus} 
+      check order here: ${project2Url}/orders`,
+    );
+
+    return OrderMapper.toResponse(order);
+  }
+
+  async updateOrderAssignee(
+    id: string,
+    orderNumber: string,
+    updateOrderAssigneeDto: UpdateOrderAssigneeDto,
+  ) {
+    const project2Url = this.configService.get('PROJECT2_URL');
+
+    const order = await this.orderRepository.findOne({
+      where: { id: id, orderNumber: orderNumber },
+      relations: ['address'],
+    });
+
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    if (updateOrderAssigneeDto.assignedTo !== undefined) {
+      order.assignedTo = updateOrderAssigneeDto.assignedTo;
+    }
+
+    await this.orderRepository.save(order);
+
+    const adminChatId = this.configService.get('TELEGRAM_CHAT_ID');
+    await this.telegramService.sendMessage(
+      adminChatId,
+      `📦 The order #${order.orderNumber} assigned to: ${updateOrderAssigneeDto.assignedTo} 
       check order here: ${project2Url}`,
     );
 

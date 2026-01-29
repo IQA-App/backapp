@@ -7,6 +7,11 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { applyDecorators } from '@nestjs/common';
+import {
+  ApiResponse,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger';
 
 /**
  * Custom decorator to trim leading and trailing spaces from a string property.
@@ -66,4 +71,45 @@ export function MatchString( //  compares two params in dto
       validator: MatchConstraint,
     });
   };
+}
+
+export function ApiCommonErrorResponses() {
+  return applyDecorators(
+    ApiResponse({
+      status: 400,
+      description: 'if something wrong, eg body, etc',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'if the resource not found',
+    }),
+    ApiResponse({
+      status: 403,
+      description: 'if the user is not authorized to do this action',
+    }),
+  );
+}
+
+// at some point we need to move this guard-decorator to separate file admin.guard.ts
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
+
+@Injectable()
+export class AdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user; // Populated by your authentication guard (e.g., JwtAuthGuard)
+
+    // Check if user exists and has the 'admin' role
+    if (user && user.role === 'admin') {
+      return true;
+    }
+
+    // Optional: Throw a custom exception instead of just returning false
+    throw new ForbiddenException();
+  }
 }

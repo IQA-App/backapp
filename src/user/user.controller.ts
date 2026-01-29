@@ -24,6 +24,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ApiCommonErrorResponses } from 'src/custom-decorators/custom-decorators.decorator';
 
 @ApiTags('user')
 @Controller('user')
@@ -39,14 +40,7 @@ export class UserController {
     status: 200,
     type: CreateUserDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'if the user requested this resourse, doesnt have admin role',
-  })
+  @ApiCommonErrorResponses()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async findAllUsers(
@@ -69,17 +63,8 @@ export class UserController {
     status: 200,
     type: CreateUserDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 403,
-    description:
-      'if the user requested this resourse, doesnt have admin role or its not an owner',
-  })
+  @ApiCommonErrorResponses()
   @ApiBearerAuth()
-  @ApiResponse({ status: 200, schema: { example: null } })
   @UseGuards(JwtAuthGuard)
   async findOneById(
     @Param('id', ParseUUIDPipe) lookUpId: string,
@@ -137,15 +122,7 @@ export class UserController {
     status: 200,
     type: CreateUserDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 403,
-    description:
-      'if the user requested this resourse, doesnt have admin role or its not an owner',
-  })
+  @ApiCommonErrorResponses()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async updateUser(
@@ -181,15 +158,7 @@ export class UserController {
     status: 200,
     description: 'returns nothing',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'if something wrong, eg body, etc',
-  })
-  @ApiResponse({
-    status: 403,
-    description:
-      'if the user requested this resourse, doesnt have rights to this user',
-  })
+  @ApiCommonErrorResponses()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async deleteUser(@Param('id', ParseUUIDPipe) lookUpId: string, @Req() req) {

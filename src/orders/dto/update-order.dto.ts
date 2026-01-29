@@ -47,6 +47,7 @@ export class UpdateOrderDto {
     message:
       'users can not change the email, ask customer service to change the email',
   })
+  @Trim()
   email: string;
 
   // @ApiProperty({ example: 'pending, in-progress, completed' })
@@ -64,6 +65,7 @@ export class UpdateOrderDto {
   @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
     message: 'Only Latin letters are allowed in the email',
   })
+  @Trim()
   authEmail: string;
 
   @IsOptional()
