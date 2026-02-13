@@ -82,6 +82,10 @@ export class UserController {
     summary: 'creates user',
     description: 'creates user. requires email and password in the body',
   })
+  @ApiBody({
+    type: CreateUserDto,
+    description: 'creates user',
+  })
   @ApiResponse({
     status: 201,
     type: CreateUserDto,
