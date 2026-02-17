@@ -64,35 +64,8 @@ spec:
     persistence:
       enabled: true
     adminPassword: admin
----
-# Grafana Ingress
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: grafana-ingress
-  namespace: monitoring
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    acme.cert-manager.io/http01-edit-in-place: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - dev0pz.com
-      secretName: dev0pz-com-tls
-  rules:
-    - host: dev0pz.com
-      http:
-        paths:
-          - path: /logs
-            pathType: Prefix
-            backend:
-              service:
-                name: grafana
-                port:
-                  number: 80
+    service:
+      port: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
