@@ -21,11 +21,6 @@ kind: Namespace
 metadata:
   name: ingress-nginx
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: monitoring
----
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -48,25 +43,6 @@ spec:
       watchIngressWithoutClass: true
       publishService:
         enabled: true
----
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: grafana
-  namespace: kube-system
-spec:
-  repo: https://grafana.github.io/helm-charts
-  chart: grafana
-  version: 7.3.13
-  targetNamespace: monitoring
-  valuesContent: |
-    fullnameOverride: grafana
-    persistence:
-      enabled: true
-    adminPassword: admin
-    service:
-      type: NodePort
-      nodePort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
