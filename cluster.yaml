@@ -65,7 +65,8 @@ spec:
       enabled: true
     adminPassword: admin
     service:
-      port: 3000
+      type: NodePort
+      nodePort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
