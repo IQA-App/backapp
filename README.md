@@ -1,99 +1,144 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Rakamakafo CRM — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for **Rakamakafo CRM**: NestJS, TypeORM, PostgreSQL. Handles auth, users, orders, partners, email, and optional Telegram integration.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## High-level architecture
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+![High-level architecture](docs/architecture-high-level.svg)
 
-## Project setup
+- **Browser** → **Ingress** (HTTPS, host `dev0pz.com`) → **frontapp** (/) or **backapp** (/api).
+- **backapp** talks to **PostgreSQL** and (optionally) **Email** and **Telegram**.
 
-```bash
-$ npm install
+---
 
-# backend setup
+## Backend (NestJS) module structure
 
-```
+![Backend module structure](docs/architecture-backend.svg)
 
-- setup Nest JS [tutorial example](https://youtube.com/playlist?list=PL0Zuz27SZ-6MexSAh5x1R3rU6Mg2zYBVr&si=Ag4OQJk8BLx9o591)
-- install TypeORM
-- install class-transformer + class-validator
-- add some folder: controller+providers
-- add dto
-- install typeorm with mssql on your machine + UI db tool e.g. dbVievwer
-- setup db connection to Nest JS. one of such video [some example](https://www.youtube.com/watch?v=pI9C7NH4K5c)
-- setup Authetification JWT [example](https://www.youtube.com/watch?v=n7PjVqKspuA&list=PLkUJHNMBzmtQj5qvTCqn0uMXFDG4ENiwf&index=6)
-- setup fake email service. we send emails to ourselfs [example](https://nodemailer.com/)
-- [example forgto and reset password](https://www.youtube.com/watch?v=Ts63ER4aExk&list=PLjN859gLfipmbdoKeI61oQVVBBPruuXMY&index=4)
+- **AppModule** imports Config, TypeORM, Health, User, Email, Auth, Orders, Telegram, Partners.
+- **Auth** uses **User** and **Email**. **Orders** and **Partners** use **Telegram**. All shaded modules use **TypeORM** for persistence.
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## Prerequisites
 
-# watch mode
-$ npm run start:dev
+- **Node.js** 18+ (LTS recommended)
+- **npm** (or yarn/pnpm)
+- **PostgreSQL** 14+ (or use Docker)
+- **.env** with required variables (see below)
 
-# production mode
-$ npm run start:prod
-```
+---
 
-## Run tests
+## Environment variables
+
+Create a `.env` in the project root (see `.gitignore`; never commit real secrets). Example:
+
+| Variable | Description |
+|----------|-------------|
+| `DB_HOST` | PostgreSQL host (e.g. `localhost`) |
+| `DB_PORT` | PostgreSQL port (e.g. `5432`) |
+| `DB_USERNAME` | DB user |
+| `DB_PASSWORD` | DB password |
+| `DB_NAME` | Database name |
+| `JWT_SECRET` | Secret for JWT signing (use a long random string) |
+| `EMAIL_TRANSPORT_USER` | SMTP user for email |
+| `EMAIL_TRANSPORT_PASSWORD` | SMTP password |
+| `PROJECT2_URL` | Optional; used by Orders (external project URL) |
+| `TELEGRAM_TOKEN` | Optional; for Telegram bot (when TelegramModule enabled) |
+
+---
+
+## Install and run
 
 ```bash
-# unit tests
-$ npm run test
+# Install dependencies
+npm install
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Development (watch mode)
+npm run start:dev
 ```
 
-## Resources
+API base: **http://localhost:3000/api** (e.g. `POST /api/auth/login`).
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Production build and run
+npm run build
+npm run start:prod
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## Tests
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Unit tests
+npm run test
 
-## Stay in touch
+# Watch mode
+npm run test:watch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Coverage
+npm run test:cov
+
+# E2E
+npm run test:e2e
+```
+
+---
+
+## API docs (Swagger)
+
+With the app running:
+
+- **http://localhost:3000/api/docs**
+
+Bearer auth: use the token from `POST /api/auth/login` or `POST /api/user` in the Swagger “Authorize” box.
+
+---
+
+## Scripts reference
+
+| Script | Description |
+|--------|-------------|
+| `npm run start` | Start once (no watch) |
+| `npm run start:dev` | Start in watch mode |
+| `npm run start:debug` | Start with debug (watch) |
+| `npm run start:prod` | Run production build (`node dist/main.js`) |
+| `npm run build` | Build for production |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Prettier-format source |
+
+---
+
+## Project structure (src)
+
+| Path | Purpose |
+|------|---------|
+| `main.ts` | Bootstrap, global prefix `api`, Swagger, validation pipe |
+| `app.module.ts` | Root module, TypeORM and feature modules |
+| `auth/` | Login, JWT, forgot/reset password, confirmation codes |
+| `user/` | User CRUD, roles |
+| `orders/` | Orders and addresses |
+| `partners/` | Partners (optional) |
+| `telegram/` | Telegram bot integration (optional) |
+| `email-service/` | Email sending (e.g. reset password) |
+| `health/` | Health check endpoint |
+| `utils/`, `types/`, `custom-decorators/` | Shared utilities and types |
+
+---
+
+## Tech stack
+
+- **NestJS** 10, **TypeScript** 5
+- **TypeORM** + **PostgreSQL**
+- **Passport** (local + JWT), **bcryptjs**, **class-validator** / **class-transformer**
+- **Swagger** (OpenAPI) for API docs
+- **Nodemailer** for email; **node-telegram-bot-api** when Telegram is enabled
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED — IQA Co. Private use.
