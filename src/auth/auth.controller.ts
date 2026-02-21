@@ -60,7 +60,7 @@ export class AuthController {
         email: { type: 'string' },
         password: { type: 'string' },
       },
-      required: ['email', 'pasword'],
+      required: ['email', 'password'],
     },
   })
   @UseGuards(LocalAuthGuard)

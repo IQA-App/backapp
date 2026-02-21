@@ -15,16 +15,14 @@ import { PartnersModule } from './partners/partners.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     HealthModule,
     UserModule,
     AuthModule,
     OrdersModule,
-    // AuthModule,
-    OrdersModule,
     EmailServiceModule,
     // TelegramModule,
     // PartnersModule,
-    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

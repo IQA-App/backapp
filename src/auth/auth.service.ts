@@ -115,7 +115,10 @@ export class AuthService {
       where: { email: resetPasswordDto.email },
     });
 
-    // find confirmation code assosaited to this user
+    if (!user) {
+      throw new NotFoundException('This user was not found');
+    }
+
     const codeInDb = await this.codeRepository.findOne({
       where: {
         user: { id: user.id },
@@ -123,9 +126,6 @@ export class AuthService {
       },
     });
 
-    if (!user) {
-      throw new NotFoundException('This user was not found');
-    }
     if (!codeInDb) {
       throw new NotFoundException('Code not found');
     }
