@@ -12,11 +12,7 @@ import {
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from './create-address.dto';
-import {
-  MatchString,
-  Trim,
-  TrimJsonString,
-} from 'src/custom-decorators/custom-decorators.decorator';
+import { Trim, TrimJsonString } from 'src/custom-decorators/custom-decorators.decorator';
 import { Type } from 'class-transformer';
 
 export class CreateOrderDto {
@@ -37,14 +33,6 @@ export class CreateOrderDto {
   @IsEmail()
   @Trim()
   email?: string;
-
-  @ApiProperty({ example: 'test@test.com', required: false })
-  @IsOptional()
-  @MatchString('email', { message: 'Email and confirmEmail do not match' })
-  @IsString()
-  @IsEmail()
-  @Trim()
-  confirmEmail?: string;
 
   @ApiProperty({ example: 'customFields can be literally anything', required: false })
   @IsOptional()

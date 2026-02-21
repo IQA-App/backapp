@@ -35,7 +35,7 @@ export class OrdersService {
     createAddressDto: CreateAddressDto,
   ) {
     const project2Url = this.configService.get('PROJECT2_URL');
-    const { confirmEmail, ...dtoData } = createOrderDto;
+    const dtoData = { ...createOrderDto };
 
     const order = await this.orderRepository.create({
       customerName: dtoData.customerName,
