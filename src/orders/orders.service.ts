@@ -35,14 +35,18 @@ export class OrdersService {
     createAddressDto: CreateAddressDto,
   ) {
     const project2Url = this.configService.get('PROJECT2_URL');
-    //  create dto without confirmEmail bc confirmEmail is just to extra validation for users
     const { confirmEmail, ...dtoData } = createOrderDto;
 
     const order = await this.orderRepository.create({
       customerName: dtoData.customerName,
-      email: dtoData.email, // takes email from the new dto
+      email: dtoData.email ?? '',
       orderNumber: generateOrderNumber(),
-      customFields: dtoData.customFields,
+      customFields:
+        dtoData.customFields != null
+          ? typeof dtoData.customFields === 'object'
+            ? JSON.stringify(dtoData.customFields)
+            : String(dtoData.customFields)
+          : '{}',
       //  use address from the dto or from createAddressDto
       address: dtoData.address
         ? Object.assign({}, dtoData.address)

@@ -25,37 +25,31 @@ export class CreateOrderDto {
   @IsString()
   @MinLength(5)
   @MaxLength(100)
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the title',
+  @Matches(/^[\p{L}\p{N}\s.,'-]+$/u, {
+    message: 'customerName can only contain letters, numbers, spaces, and  . , \' -',
   })
   @Trim()
   customerName: string;
 
-  @ApiProperty({ example: 'test@test.com' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'test@test.com', required: false })
+  @IsOptional()
   @IsString()
   @IsEmail()
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the email',
-  })
   @Trim()
-  email: string;
+  email?: string;
 
-  @ApiProperty({ example: 'test@test.com' })
-  @MatchString('email', { message: 'Email and confirmEmail doesnt match' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'test@test.com', required: false })
+  @IsOptional()
+  @MatchString('email', { message: 'Email and confirmEmail do not match' })
   @IsString()
   @IsEmail()
-  @Matches(/^(?!.*[^\P{Alphabetic}a-zA-Z])/u, {
-    message: 'Only Latin letters are allowed in the confirmEmail',
-  })
   @Trim()
-  confirmEmail: string;
+  confirmEmail?: string;
 
-  @ApiProperty({ example: 'customFields can be literally anything' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'customFields can be literally anything', required: false })
+  @IsOptional()
   @TrimJsonString()
-  customFields: any;
+  customFields?: any;
 
   @ApiProperty({
     example:
