@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" width="560" height="320">
+  <defs>
+    <marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect width="560" height="320" fill="#fafafa" rx="4"/>
+  <text x="280" y="24" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333">Backapp  Module dependencies</text>
+  <rect x="200" y="44" width="160" height="36" rx="6" fill="#c2185b" stroke="#880e4f" stroke-width="1.5"/>
+  <text x="280" y="66" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#fff">AppModule</text>
+  <rect x="40" y="100" width="100" height="32" rx="4" fill="#5c6bc0" stroke="#3949ab" stroke-width="1"/>
+  <text x="90" y="120" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">ConfigModule</text>
+  <rect x="420" y="100" width="100" height="32" rx="4" fill="#5c6bc0" stroke="#3949ab" stroke-width="1"/>
+  <text x="470" y="120" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">TypeORM (DB)</text>
+  <rect x="20" y="160" width="72" height="36" rx="4" fill="#66bb6a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="56" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Health</text>
+  <rect x="108" y="160" width="72" height="36" rx="4" fill="#66bb6a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="144" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">User</text>
+  <rect x="196" y="160" width="72" height="36" rx="4" fill="#66bb6a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="232" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Email</text>
+  <rect x="284" y="160" width="72" height="36" rx="4" fill="#ec407a" stroke="#c2185b" stroke-width="1"/>
+  <text x="320" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Auth</text>
+  <rect x="372" y="160" width="72" height="36" rx="4" fill="#ec407a" stroke="#c2185b" stroke-width="1"/>
+  <text x="408" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Orders</text>
+  <rect x="460" y="160" width="72" height="36" rx="4" fill="#66bb6a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="496" y="182" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Telegram</text>
+  <rect x="244" y="216" width="72" height="36" rx="4" fill="#66bb6a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="280" y="238" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#fff">Partners</text>
+  <path d="M280 80 L90 100" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L470 100" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L56 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L144 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L232 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L320 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L408 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L496 160" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M280 80 L280 216" stroke="#333" stroke-width="1" fill="none" marker-end="url(#arrow2)"/>
+  <path d="M284 196 L144 176" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#arrow2)"/>
+  <path d="M320 196 L232 176" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#arrow2)"/>
+  <path d="M372 196 L460 176" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#arrow2)"/>
+  <path d="M280 252 L460 196" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#arrow2)"/>
+  <path d="M470 132 L144 156" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="2 2" marker-end="url(#arrow2)"/>
+  <path d="M470 132 L320 156" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="2 2" marker-end="url(#arrow2)"/>
+  <path d="M470 132 L408 156" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="2 2" marker-end="url(#arrow2)"/>
+  <path d="M470 132 L496 156" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="2 2" marker-end="url(#arrow2)"/>
+  <path d="M470 132 L280 232" stroke="#555" stroke-width="1" fill="none" stroke-dasharray="2 2" marker-end="url(#arrow2)"/>
+  <text x="12" y="300" font-family="sans-serif" font-size="9" fill="#666">Solid: imports. Dashed: Auth’User/Email, Orders/Partners’Telegram, TypeORM’entities.</text>
+</svg>
