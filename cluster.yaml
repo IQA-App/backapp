@@ -16,7 +16,8 @@ spec:
   valuesContent: |-
     installCRDs: true
     extraArgs:
-      - --dns01-self-check-nameservers=8.8.8.8:53
+      - --dns01-recursive-nameservers="8.8.8.8:53"
+      - --dns01-recursive-nameservers-only="true"
 ---
 apiVersion: v1
 kind: Namespace
