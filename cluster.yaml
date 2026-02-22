@@ -15,9 +15,15 @@ spec:
   targetNamespace: cert-manager
   valuesContent: |-
     installCRDs: true
+    # Use public DNS so HTTP-01 self-check can reach dev0pz.com (same view as internet)
+    podDnsPolicy: "None"
+    podDnsConfig:
+      nameservers:
+        - "8.8.8.8"
+        - "1.1.1.1"
     extraArgs:
       - --dns01-recursive-nameservers-only
-      - --dns01-recursive-nameservers=8.8.8.8:53\,1.1.1.1:53
+      - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
 ---
 apiVersion: v1
 kind: Namespace
