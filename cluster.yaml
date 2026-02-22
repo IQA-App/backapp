@@ -15,12 +15,12 @@ spec:
   targetNamespace: cert-manager
   valuesContent: |-
     installCRDs: true
-    # Use public DNS so HTTP-01 self-check can reach dev0pz.com (same view as internet)
-    podDnsPolicy: "None"
-    podDnsConfig:
-      nameservers:
-        - "8.8.8.8"
-        - "1.1.1.1"
+    # Behind NAT: resolve dev0pz.com to ingress internal IP so HTTP-01 self-check hits ingress in-cluster.
+    # Get the IP: kubectl get svc -n ingress-nginx ingress-nginx-controller -o jsonpath='{.spec.clusterIP}'
+    hostAliases:
+      - ip: "10.43.129.96"
+        hostnames:
+          - "dev0pz.com"
     extraArgs:
       - --dns01-recursive-nameservers-only
       - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
@@ -136,6 +136,30 @@ spec:
       - http01:
           ingress:
             class: nginx
+---
+# DNS-01 issuer: use this when pods cannot reach the domain (e.g. no NAT hairpinning).
+# 1) Create secret with DNS provider API credentials (example: Cloudflare).
+#    Cloudflare: kubectl create secret generic cloudflare-api-token --from-literal=api-token=YOUR_TOKEN -n cert-manager
+# 2) Switch ingress to this issuer: set cert-manager.io/cluster-issuer: "letsencrypt-prod-dns01"
+#    and remove acme.cert-manager.io/http01-edit-in-place.
+# 3) Adapt dns01.dns01 below to your provider (route53, digitalocean, etc.) if not Cloudflare.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod-dns01
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: floridavbv@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-dns01-account-key
+    solvers:
+      - dns01:
+          cloudflare:
+            email: your-cloudflare-account-email@example.com
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
 ---
 apiVersion: apps/v1
 kind: Deployment
