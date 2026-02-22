@@ -13,11 +13,13 @@ spec:
   chart: cert-manager
   version: v1.16.1
   targetNamespace: cert-manager
+  dnsConfig:
+    nameservers:
+      - 8.8.8.8
+      - 1.1.1.1
+  dnsPolicy: none
   valuesContent: |-
     installCRDs: true
-    extraArgs:
-      - --dns01-recursive-nameservers="8.8.8.8:53"
-      - --dns01-recursive-nameservers-only
 ---
 apiVersion: v1
 kind: Namespace
