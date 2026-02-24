@@ -18,7 +18,7 @@ export class TelegramService {
   ) {
     const TELEGRAM_TOKEN = this.configService.get('TELEGRAM_TOKEN');
 
-    this.bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+    this.bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false }); // telegram spam in logs
 
     // use bot just once
     this.bot.on('message', (msg) => this.onReceiveMessage(msg));
